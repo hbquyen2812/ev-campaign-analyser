@@ -214,6 +214,10 @@ for example `D:/USER-BEHAVIOR-SOCIAL-MEDIA`. Configure MinIO/Airflow credentials
 `PRIVACY_HASH_SALT` for the intended environment. Add `YOUTUBE_API_KEY` for YouTube
 discovery/refresh; enable X/Reddit only after their source/session setup is ready.
 
+MinIO server/client images are built from pinned official source because their
+original public container tags are unavailable. The initial build takes several
+minutes. See [the MinIO build notes](../deployment/minio/README.md).
+
 ```powershell
 .\scripts\ensure_resilient_stack.ps1 -SparkWorkers 1 -SkipXBrowser
 ```
@@ -292,8 +296,21 @@ docker compose --env-file .env.example -f docker-compose.yml config --quiet
 ```
 
 Frontend tests include mocked HTTP calls and server-proxy behavior. API unit tests stub
-inference; passing them alone is not evidence of real model execution. Full Spark/Airflow
-and E2E validation requires the corresponding runtime and was not run for this refactor.
+inference; passing them alone is not evidence of real model execution.
+
+To run the complete deterministic data-pipeline test, start Docker and use Bash
+(Git Bash on Windows) from the repository root:
+
+```bash
+bash tests/e2e/run_pipeline_reliability_e2e.sh
+```
+
+The script uses `python3`, falling back to `python` on Git Bash; set `PYTHON_BIN`
+to override it. It builds a separate Compose project, injects fixture events,
+tests crash recovery and replay, exports a training dataset, and checks dashboard
+reads. It removes only its own containers and test volumes when finished. Evidence
+is saved in `tests/e2e/.artifacts/`. Do not run two copies concurrently in the same
+checkout. GitHub Actions runs this test after unit, contract, Spark, and Airflow checks.
 
 | Symptom | Meaning and next action |
 |---|---|
@@ -306,6 +323,7 @@ and E2E validation requires the corresponding runtime and was not run for this r
 | Optional marketing API 404 | Endpoint is not implemented in backend main |
 | Proxy 504 | Upstream call exceeded the configured request budget |
 | Docker named-pipe error | Docker Desktop/Linux engine is not running |
+| `pull access denied for minio/mc` | Update to the source-build fix, then rebuild `minio` and `minio-init` |
 | Empty dashboard | Verify actual ingestion/tables, not only container liveness |
 | Official training rejects dirty Git | Commit intended source or use an explicitly non-official experiment |
 | Fresh clone cannot predict | Git does not include trained model artifacts |

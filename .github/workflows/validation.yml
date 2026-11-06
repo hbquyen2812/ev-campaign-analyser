@@ -163,3 +163,4 @@ jobs:
           name: pipeline-reliability-e2e
           path: tests/e2e/.artifacts
           if-no-files-found: ignore
+          include-hidden-files: true

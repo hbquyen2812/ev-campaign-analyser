@@ -11,6 +11,7 @@ RUN chmod +x /usr/local/bin/docker /usr/local/lib/docker/cli-plugins/docker-comp
 
 COPY orchestrator/dags/ /opt/airflow/dags/
 COPY docker-compose.yml /workspace/docker-compose.yml
+COPY deployment/minio/ /workspace/deployment/minio/
 COPY .env.example /workspace/.env.example
 COPY dashboard/ /workspace/dashboard/
 COPY playwright/ /workspace/playwright/

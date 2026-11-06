@@ -23,6 +23,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - image: user-behavior-social-media-minio
+            context: ./deployment/minio
+            dockerfile: ./deployment/minio/Dockerfile
+            target: server
+          - image: user-behavior-social-media-minio-client
+            context: ./deployment/minio
+            dockerfile: ./deployment/minio/Dockerfile
+            target: client
           - image: user-behavior-social-media-dashboard
             context: .
             dockerfile: ./dashboard/Dockerfile
@@ -106,6 +114,7 @@ jobs:
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
           push: true
           tags: |
             ${{ env.DOCKERHUB_NAMESPACE }}/${{ matrix.image }}:${{ env.IMAGE_TAG }}

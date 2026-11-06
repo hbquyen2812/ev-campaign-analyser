@@ -9,6 +9,8 @@ class DockerComposeBundleTests(unittest.TestCase):
     def test_bundle_removes_every_local_build_context(self):
         bundle = (ROOT / "deployment" / "compose.bundle.yaml").read_text(encoding="utf-8")
         expected_services = {
+            "minio",
+            "minio-init",
             "dashboard",
             "youtube-collector",
             "x-collector",
@@ -31,6 +33,8 @@ class DockerComposeBundleTests(unittest.TestCase):
         )
 
         self.assertIn("user-behavior-social-media-ai-trainer", workflow)
+        self.assertIn("user-behavior-social-media-minio", workflow)
+        self.assertIn("user-behavior-social-media-minio-client", workflow)
         self.assertIn("user-behavior-social-media-ai-server", workflow)
         self.assertIn("publish-compose-bundle:", workflow)
         self.assertIn("gh release upload", workflow)

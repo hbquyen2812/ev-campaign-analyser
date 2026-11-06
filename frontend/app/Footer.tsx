@@ -11,7 +11,7 @@ export default function Footer() {
         <span>{t("footer.tagline")}</span>
         <span>
           <Link href="/insights">{t("footer.insights")}</Link>
-          <a href="https://github.com/VeillonC/viral-insight-webapp-USER-BEHAVIOR" target="_blank" rel="noreferrer">{t("footer.github")}</a>
+          <a href="https://github.com/hbquyen2812/ev-campaign-analyser" target="_blank" rel="noreferrer">{t("footer.github")}</a>
         </span>
       </div>
     </footer>

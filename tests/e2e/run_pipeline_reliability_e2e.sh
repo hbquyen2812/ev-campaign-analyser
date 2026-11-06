@@ -12,7 +12,13 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
 
 project_name="${E2E_COMPOSE_PROJECT_NAME:-user-behavior-pipeline-e2e}"
-artifacts="$repo_root/tests/e2e/.artifacts"
+python_bin="${PYTHON_BIN:-python3}"
+if [[ -z "${PYTHON_BIN:-}" && -n "${MSYSTEM:-}" ]] && ! command -v "$python_bin" >/dev/null 2>&1; then
+  python_bin=python
+fi
+# Keep host Python paths relative: MSYS path conversion is disabled for Docker,
+# and native Windows Python cannot resolve Git Bash's /c/... or /d/... paths.
+artifacts="tests/e2e/.artifacts"
 mkdir -p "$artifacts"
 
 compose=(docker compose -p "$project_name" -f tests/e2e/docker-compose.yml)
@@ -102,7 +108,7 @@ produce_fixture() {
 }
 
 echo "Building deterministic E2E fixture"
-python3 tests/e2e/pipeline_fixture.py \
+"$python_bin" tests/e2e/pipeline_fixture.py \
   --events-output "$artifacts/events.jsonl" \
   --schema-path schemas/playwright_event.avsc \
   --schema-payload-output "$artifacts/schema-registry.json"

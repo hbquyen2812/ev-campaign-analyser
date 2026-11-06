@@ -4,6 +4,10 @@
 # v2.24.4 and later; it removes local build contexts so a bundle can only pull
 # the release images from Docker Hub.
 services:
+  minio:
+    build: !reset null
+  minio-init:
+    build: !reset null
   dashboard:
     build: !reset null
   youtube-collector:

@@ -1,8 +1,8 @@
 # Integration verification
 
 Verification date: **6 November 2026**. Source revisions are recorded in
-[SOURCE_PROVENANCE.md](SOURCE_PROVENANCE.md). These are local checks, not production
-certification or a new model evaluation.
+[SOURCE_PROVENANCE.md](SOURCE_PROVENANCE.md). This records local checks and the initial GitHub Actions investigation. It is not
+production certification or a new model evaluation.
 
 ## Passed
 
@@ -18,6 +18,11 @@ certification or a new model evaluation.
 | Real API inference/report | Installed `legacy` artifact produces a prediction, five factors, and a template report |
 | Product route HTTP checks | `/`, `/analyze`, `/variant-lab`, `/history`, `/insights` return 200 |
 | Proxy health, prediction, report | All return 200 through the production Next.js server |
+| Browser interaction | Sample campaign produced three platform scores and a template report; History saved it; Variant lab ranked two posts |
+| Additional model availability | `audience-x90` returns 503 because its local model file is absent |
+| MinIO source builds | Server and client compile from the pinned, checksum-verified official sources |
+| Compose/CI/fixture regression checks | 12 focused tests pass; development, bundle, and E2E Compose configurations validate |
+| Complete Docker E2E | Passes with the source-built MinIO images, including injected failure, restart, reconciliation, analytics, dataset export, and replay |
 | Token boundary | Proxy succeeds with server credentials; direct unauthenticated backend prediction returns 401 |
 | Expected compatibility gaps | Report-job and three optional marketing-analysis endpoints return 404 |
 | Compose syntax | `docker compose --env-file .env.example -f docker-compose.yml config --quiet` passes |
@@ -43,14 +48,50 @@ does not validate predictive accuracy, calibration, or generalization.
 - Restricted sandbox processes encountered socket/build-output permission failures.
   The affected local checks were rerun with the required tool execution permissions.
 
+## GitHub Actions failure investigation
+
+The first main-branch run for `07fa2cd` is
+[Main Branch Validation #42186713184](https://github.com/hbquyen2812/ev-campaign-analyser/actions/runs/42186713184).
+Frontend validation and the static-unit, contract, Spark, and Airflow jobs passed.
+Only E2E failed, before it could execute the data pipeline, because Docker Hub
+rejected `minio/mc:RELEASE.2025-08-13T08-35-41Z` with `pull access denied`.
+This was an infrastructure-image retrieval failure, not a failed Git push.
+
+The fix builds both MinIO releases from pinned official source with archive
+checksums, wires the images into development/E2E/release Compose configurations,
+and includes the build context in the Airflow image. Hidden E2E evidence is now
+included in the Actions artifact upload. Git Bash also uses a suitable Python
+executable and relative fixture paths compatible with native Windows Python.
+See [the build notes](../deployment/minio/README.md).
+
+## Full local pipeline result after the fix
+
+`tests/e2e/run_pipeline_reliability_e2e.sh` completed with exit code 0 using the
+isolated Compose project `codex-ci-verify-20261106` on Docker Desktop. The test
+containers and their MinIO volume were removed by the test cleanup handler.
+
+- The fixture contains 17 messages and 15 distinct valid events.
+- After the intentional post-commit failure, the Bronze journal remained intact
+  and its current projection was still empty. Restarting recovered the projection.
+- Bronze/Silver reconciliation reported 15 journal events, 15 applied events,
+  zero missing events, zero duplicates, and zero orphan applied events.
+- Analytics produced 5 contents, 2 interactions, 3 transcripts, and 6 snapshots.
+- Two dataset builds produced the same dataset version with 2 training examples.
+- Replaying the complete fixture preserved these counts and passed reconciliation.
+- The dashboard loader read 7 events, 5 contents, 3 transcripts, and 2 training examples
+  before and after replay.
+
+Detailed local evidence is retained in the ignored `tests/e2e/.artifacts/` directory.
+The fixture is intentionally small and synthetic; these results establish the tested
+pipeline behavior, not production throughput or trained-model accuracy.
+
 ## Not verified or not available
 
-- Full Docker/Kafka/Spark/Airflow ingestion, reconciliation, and E2E runtime execution.
-  Docker Desktop's Linux engine was not running during the initial inspection.
+- Airflow scheduling against a production deployment; the initial CI DagBag job passed,
+  while the local E2E invokes the same pipeline jobs directly through Spark.
 - A new training run, model benchmark, official v3 evaluation, or Stage-2 evaluation.
-- Production deployment, remote server state, public hosting, or GitHub Actions execution.
+- Production deployment, remote server state, or public hosting.
 - Real Ollama report generation and live external-source collection.
-- Browser interaction/visual rendering; page checks above are HTTP checks.
 - The `audience-x90` model: its default local artifact path is missing.
 - Successful optional barrier/greenwashing/sentiment APIs: they are not implemented in
   the imported backend main branch.

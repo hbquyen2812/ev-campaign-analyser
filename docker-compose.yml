@@ -209,7 +209,10 @@ x-airflow-common: &airflow-common
 services:
 
   minio:
-    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: ${DOCKERHUB_NAMESPACE:-raph0603}/user-behavior-social-media-minio:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ./deployment/minio
+      target: server
     logging: *default-logging
     restart: unless-stopped
 
@@ -229,7 +232,10 @@ services:
       - minio-data:/data
 
   minio-init:
-    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: ${DOCKERHUB_NAMESPACE:-raph0603}/user-behavior-social-media-minio-client:${PROJECT_IMAGE_TAG:-latest}
+    build:
+      context: ./deployment/minio
+      target: client
     logging: *default-logging
 
     depends_on:

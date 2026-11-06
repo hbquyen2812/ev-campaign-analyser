@@ -30,3 +30,17 @@ The user created the destination repository. Publishing this source does not dep
 production services or train models. Automatic production promotion requires the explicit
 Actions variable `ENABLE_AUTO_PROMOTION=true`. See [NEW_REPOSITORY.md](NEW_REPOSITORY.md)
 for repository setup and the normal development workflow.
+
+## Repository ownership and inherited history
+
+The destination owner is `hbquyen2812`. On 6 November 2026, GitHub's collaborator
+API listed only `hbquyen2812`, with the `admin` role. Contributor names describe
+commit authorship; they do not grant access to this new repository.
+
+The integration commit `07fa2cd` retained the original 393 backend-history commits,
+bringing that revision to 394 commits. Git preserves author names, commit dates,
+and parent links when history is pushed to another remote. Consequently, August
+2026 commits remain visible even though this destination was created in November.
+Those dates describe the original commits, not the creation date of this repository.
+Subsequent fixes increase the count. The imported frontend's separate Git history
+is not included as additional ancestors; its source revision is recorded above.
