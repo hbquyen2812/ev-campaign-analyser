@@ -108,6 +108,10 @@ ml/models/stage1_multisource_audience_x90.joblib  audience-x90
 Older bundles can also require `rhetorical_role.joblib` and `topic_model.joblib` from
 the matching training run. Keep artifacts and dependency versions compatible. The local
 legacy file exists; the default audience-x90 file was absent during inspection.
+The installed legacy artifact runs, but fails three official v3 feature-contract
+checks because it still uses audience features and has no dataset version.
+See [the verification record](VERIFICATION.md#installed-model-contract-3-failed-3-passed)
+before treating its predictions as an official v3 result.
 Git ignores model weights, so a new clone will not include them. Obtain the appropriate
 artifacts or train a model before expecting prediction requests to succeed.
 

@@ -87,6 +87,8 @@ pipeline behavior, not production throughput or trained-model accuracy.
 
 ## Not verified or not available
 
+- The installed historical model fails three official feature-contract checks;
+  see the detailed result below. Successful inference does not imply v3 compliance.
 - Airflow scheduling against a production deployment; the initial CI DagBag job passed,
   while the local E2E invokes the same pipeline jobs directly through Spark.
 - A new training run, model benchmark, official v3 evaluation, or Stage-2 evaluation.
@@ -98,3 +100,34 @@ pipeline behavior, not production throughput or trained-model accuracy.
 
 Temporary local API and web servers used for HTTP verification are stopped after checks.
 Use [RUNNING.md](RUNNING.md) to start your own development sessions.
+
+## Installed model contract: 3 failed, 3 passed
+
+The additional command below was run with the real local model after the web and
+Docker checks. GitHub skips these six tests because trained weights are ignored
+by Git and are absent on its runner.
+
+```powershell
+.\ml\.venv\Scripts\python.exe -m pytest tests/scripts/test_serve_train_parity.py -q
+```
+
+Three checks fail: the model contains `chan_*` audience features, changing the
+audience argument changes its feature row, and changing that argument changes
+its prediction. The installed `stage1_multisource.joblib` is a historical artifact
+with `dataset_version=None`, not an official v3 model. Its bundle contains
+`chan_audience_available`, `chan_audience_is_zero`, `chan_has_audience`, and
+`chan_log_audience`. The other three checks pass: feature-column coverage,
+classification using the bundled threshold, and explaining that threshold.
+
+The serving implementation intentionally supports historical feature sets. Do not
+remove trained input columns or weaken these checks to make this artifact appear
+v3-compliant. To satisfy the official contract, obtain a verified official v3
+artifact and its matching dependencies, or train from an eligible versioned
+dataset using the documented official workflow. No compatible replacement was
+present in the local models directory. Model files and existing test assertions
+were left unchanged.
+
+The usable local scope is therefore historical-model prediction, template reports,
+history, variant comparison, and the tested synthetic data pipeline. Official v3
+model validation, the missing 58K artifact, and the three missing optional
+marketing-analysis endpoints remain outstanding.
