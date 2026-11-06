@@ -1,0 +1,117 @@
+EV CAMPAIGN ANALYSER — PROJECT ACHIEVEMENTS AND CURRENT STATUS
+Reviewed on 6 November 2026
+
+SHORT DESCRIPTION
+
+An explainable social-media analytics platform for electric-vehicle marketing. The
+project combines multi-source collection, a Kafka/Spark/Iceberg lakehouse, reproducible
+machine-learning workflows, an AI prediction API, an operational dashboard, and a
+Next.js application for reviewing proposed content across YouTube, X, and Reddit.
+
+DETAILED DESCRIPTION
+
+The project has implemented a data-to-insight workflow for analyzing social-media
+content and supporting electric-vehicle marketing decisions. Its purpose is to turn
+collected posts, videos, comments, and engagement observations into structured data,
+explainable predictions, and practical reports. The system separates data collection,
+processing, model development, inference, and user interaction into components that
+can evolve and be deployed independently.
+
+The collection layer supports YouTube, X, and Reddit. YouTube discovery, metadata,
+transcripts, comments, channel statistics, and engagement refresh are handled through
+separate workers with persistent state and configurable limits. X uses an authenticated
+browser session, while Reddit collection supports configurable communities, keyword
+filters, and authentication settings. Common event contracts retain source identity,
+content relationships, timestamps, engagement measurements, and enrichment outcomes.
+
+The data platform uses Kafka for event transport, Spark for processing, Apache Iceberg
+for managed analytical tables, and MinIO for object storage. Privacy cleaning and
+validation occur before events enter Bronze. Implemented safeguards include salted
+identifier hashing, rule-based personal-information redaction, text normalization,
+schema-aware decoding, and dead-letter routing for invalid records.
+
+Reliability is a substantial part of the implementation. The Bronze layer includes an
+immutable event journal, while Silver maintains current state and application proofs.
+Deterministic identifiers, idempotent merges, committed-row handoffs, persistent worker
+outboxes, and reconciliation tools support retry and recovery without treating every
+retry as new data. These mechanisms are accompanied by contract and integration tests.
+
+The analytical layer distinguishes content from interactions and maintains historical
+engagement observations. Repeated measurements support growth rates, acceleration,
+engagement ratios, delayed outcome labels, and analytical summaries. Quality results,
+source coverage, collection state, and pipeline activity can be inspected through a
+Streamlit dashboard. The dashboard also supports crawler configuration and importing
+previously collected files into the processing workflow.
+
+The Stage-1 machine-learning workflow predicts high-engagement propensity from content
+available before publication. It combines text and structural features, platform signals,
+a TF-IDF/logistic-regression content model, topic features, and XGBoost. Calibration and
+model-specific decision thresholds are supported, and tree-based contribution values
+provide explanations for individual predictions.
+
+The current official evaluation workflow uses author-grouped cross-validation and
+out-of-fold predictions. Dataset fingerprints, pinned Iceberg snapshots, source-code
+revisions, environment identities, training configuration, fold membership, model hashes,
+and evaluation artifacts form a reproducibility chain. Versioned virality contracts
+freeze engagement-label thresholds instead of redefining an example's label whenever
+the evaluation population changes. Official training excludes audience data that cannot
+be shown to precede publication and excludes exploratory rhetorical-role features from
+the current grouped evaluation path.
+
+A separate Stage-2 training path uses early post-publication engagement sequences to
+refine the initial prediction. Dataset-building and training code is present, but this
+path still requires stronger evaluation on real longitudinal observations and alignment
+with the newer label/provenance contract. It is not currently exposed as a working
+frontend feature or a dedicated prediction API endpoint.
+
+The FastAPI service exposes health information, single-post prediction, batch prediction,
+and report generation. It supports selectable model aliases and optional bearer-token
+authentication. Reports can use deterministic English/Vietnamese templates or an optional
+Ollama backend. The viral score is produced by the machine-learning model; language
+generation is used to communicate the result rather than invent its probability.
+
+The Next.js application provides a product interface for entering campaign content,
+comparing predictions across three platforms, inspecting explanatory factors, comparing
+text variants, and viewing reports. Browser-local history supports search, filtering,
+reuse, deletion, and CSV export. The interface retains English and Vietnamese support.
+Its analysis queue serializes requests within the page; it is not a persistent server
+queue or a replacement for account-backed campaign storage.
+
+The integration work brings frontend and backend source into one repository while
+retaining separate deployment targets. The frontend's hardcoded private-network API URL
+has been replaced by a same-origin Next.js proxy. Backend credentials are attached on
+the server, supported routes are explicitly allowed, requests have timeouts, and status
+codes are preserved for compatibility. Browser transport, domain API calls, and server
+proxy logic are separated into focused modules. Root development commands, frontend CI,
+local configuration helpers, API startup tooling, and English handover documentation
+have also been added.
+
+CURRENT LIMITATIONS AND INTERPRETATION
+
+The reviewed backend main branch does not yet implement the frontend's optional barrier,
+greenwashing, sentiment, or asynchronous report-job endpoints. The report client can fall
+back to synchronous reporting when the queue endpoint is absent. Optional analysis cards
+therefore remain incomplete until their backend contracts are implemented and tested.
+
+Model weights and datasets are not supplied by cloning the source. A model alias shown
+in the interface does not establish that its artifact is available. Historical evaluation
+artifacts, static frontend performance figures, and illustrative landing-page examples
+must not be presented as a newly measured production result. The pinned historical
+197-example dataset and the separate 6,000-row evaluation use different evidence and
+must not be directly compared without accounting for their protocols and lineage.
+
+The project has achieved an implemented multi-source data platform, reproducibility
+infrastructure, explainable inference service, operational dashboard, and integrated
+product frontend. The next priorities are completing the optional APIs, publishing
+verified model metadata, producing a sufficiently supported official evaluation,
+validating Stage 2, and establishing the access controls and operational practices
+needed for the intended deployment.
+
+SOURCE REFERENCES
+
+Backend source: https://github.com/raph0603/USER-BEHAVIOR-SOCIAL-MEDIA
+Frontend source: https://github.com/VeillonC/viral-insight-webapp-USER-BEHAVIOR
+Exact revisions and local changes: docs/SOURCE_PROVENANCE.md
+Detailed technical review: docs/PROJECT_OVERVIEW.md
+Startup and verification: docs/RUNNING.md
+New repository and commit workflow: docs/NEW_REPOSITORY.md

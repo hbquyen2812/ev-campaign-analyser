@@ -1,4 +1,7 @@
 .git
+# Next.js has its own deployment and is not part of backend build contexts.
+frontend/
+.local-analysis/
 .github
 .code-review-graph
 .devcontainer

@@ -1,5 +1,23 @@
 # USER-BEHAVIOR-SOCIAL-MEDIA
 
+## Integrated workspace
+
+Project repository: [hbquyen2812/ev-campaign-analyser](https://github.com/hbquyen2812/ev-campaign-analyser).
+
+The Next.js product frontend is now included in `frontend/`, alongside the data
+pipeline, Streamlit operations dashboard, and Python AI service. These components
+share one repository and can be deployed independently.
+
+- [Detailed project overview and implementation status](docs/PROJECT_OVERVIEW.md)
+- [Copy-ready project achievements](docs/PROJECT_ACHIEVEMENTS.txt)
+- [Setup, running, verification, and troubleshooting](docs/RUNNING.md)
+- [Creating a new repository and committing the project](docs/NEW_REPOSITORY.md)
+- [Original repositories and imported revisions](docs/SOURCE_PROVENANCE.md)
+
+For Windows development, configure the proxy with `./scripts/setup_local_web.ps1`,
+start the AI service with `./scripts/start_api.ps1`, and run `npm run dev:web` in
+another terminal. See the running guide for dependencies and model prerequisites.
+
 ## Lakehouse (Bronze/Silver on Iceberg)
 
 This stack includes MinIO (S3-compatible) and Spark jobs that write to Iceberg tables.
@@ -243,6 +261,11 @@ The startup script also replaces weak local Airflow defaults in `.env` and
 keeps dashboard credentials aligned with the generated Airflow password.
 
 ### Production release and Docker Hub
+
+Automatic promotion is opt-in for this repository. Configure the `production`
+branch and release credentials, then set the repository Actions variable
+`ENABLE_AUTO_PROMOTION=true` when promotion should be enabled. Until then,
+source pushes run validation without triggering the promotion job.
 
 Production promotion runs through the GitHub Actions workflow that merges
 `main` into `production`, then runs Release Please. When Release Please creates

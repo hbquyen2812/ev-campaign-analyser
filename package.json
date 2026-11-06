@@ -1,0 +1,11 @@
+{
+  "name": "user-behavior-social-media",
+  "private": true,
+  "scripts": {
+    "setup:web": "npm --prefix frontend ci",
+    "dev:web": "npm --prefix frontend run dev -- --hostname 127.0.0.1",
+    "build:web": "npm --prefix frontend run build",
+    "start:web": "npm --prefix frontend run start -- --hostname 127.0.0.1",
+    "check:web": "npm --prefix frontend run check:i18n && npm --prefix frontend run typecheck && npm --prefix frontend test"
+  }
+}
