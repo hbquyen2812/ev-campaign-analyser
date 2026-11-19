@@ -78,7 +78,8 @@ export interface Persona {
   tagline: Localized;
   age: string;
   situation: Localized;
-  concerns: string[];
+  /** What this person worries about, phrased the way it goes into the prompt. */
+  concerns: Localized;
   voice: Localized;
   seedQuotes: PersonaQuote[];
   openingQuestions: Partial<Record<Lang, string[]>>;

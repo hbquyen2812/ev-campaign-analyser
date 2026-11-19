@@ -21,7 +21,7 @@ export const personaName = (id: string, lang: Lang): string =>
 
 /** Spec sheet as prompt lines. The illustrative tag travels with the number, always. */
 export function specSheetLines(lang: Lang): string[] {
-  const tag = lang === "vi" ? "(số minh hoạ)" : "(illustrative)";
+  const tag = lang === "vi" ? "(số minh họa)" : "(illustrative)";
   return SPEC_SHEET.items.map((item) => {
     const unit = item.unit ? ` ${item.unit}` : "";
     const note = item.illustrative ? ` ${tag}` : "";
@@ -105,7 +105,7 @@ export function buildPersonaPrompt({ persona, post, lang, count }: PersonaPrompt
     `${h.name}: ${persona.name[lang]}`,
     `${h.age}: ${persona.age}`,
     `${h.life}: ${persona.situation[lang]}`,
-    `${h.care}: ${persona.concerns.join(", ")}`,
+    `${h.care}: ${persona.concerns[lang]}`,
     `${h.speak}: ${persona.voice[lang]}`,
     "",
     `## ${h.real}`,

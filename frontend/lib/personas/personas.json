@@ -18,7 +18,10 @@
         "vi": "Đang đi xe xăng, cân nhắc đổi sang xe điện. So từng đồng chi phí 5 năm: giá xe, tiền điện, tiền thay pin.",
         "en": "Rides a petrol bike, considering switching. Compares every dong of 5-year cost: price, electricity, battery replacement."
       },
-      "concerns": ["cost", "battery-replacement", "resale"],
+      "concerns": {
+        "vi": "Tiền. Giá lăn bánh, tiền thay pin, tổng chi phí 5 năm so với xe xăng, giá bán lại.",
+        "en": "Money. On-road price, battery replacement, five-year cost versus petrol, resale value."
+      },
       "voice": {
         "vi": "Câu ngắn, cộc. Luôn kết bằng một câu hỏi có con số. Không khách sáo. Hay dùng 'tính ra', 'vậy chứ', 'bao nhiêu'.",
         "en": "Short, blunt sentences. Always ends on a question that demands a number."
@@ -56,7 +59,10 @@
         "vi": "Ở thành phố hay ngập khi mưa, chở con đi học mỗi ngày. Đọc nhiều tin xe điện chết máy giữa đường và cháy pin.",
         "en": "Lives in a city that floods, rides her child to school daily. Has read many stories of EVs stalling and batteries catching fire."
       },
-      "concerns": ["flood", "safety", "reliability", "battery-fire"],
+      "concerns": {
+        "vi": "An toàn. Đi qua đường ngập, chạy dưới mưa lớn, chết máy giữa đường, cháy pin khi sạc.",
+        "en": "Safety. Riding through floods and heavy rain, stalling mid-road, battery fires while charging."
+      },
       "voice": {
         "vi": "Lo lắng, hỏi dồn. Hay kể trường hợp nghe được. Cần được trấn an bằng giới hạn cụ thể, không phải lời hứa.",
         "en": "Anxious, asks in bursts. Cites stories she has heard. Needs concrete limits, not reassurance."
@@ -94,7 +100,10 @@
         "vi": "Thuê phòng trọ, chủ trọ không cho sạc pin trong nhà vì sợ cháy. Đi học 10 km mỗi ngày, tiền bố mẹ cho có hạn.",
         "en": "Rents a room where the landlord bans indoor charging over fire risk. Rides 10 km to class daily on an allowance."
       },
-      "concerns": ["charging-access", "cost", "range", "landlord"],
+      "concerns": {
+        "vi": "Chỗ sạc. Chủ trọ không cho sạc trong phòng, sạc ở đâu, đi được bao xa, tiền có đủ không.",
+        "en": "Where to charge. A landlord who bans indoor charging, public charging points, range, affordability."
+      },
       "voice": {
         "vi": "Thân thiện, dùng tiếng lóng nhẹ, hỏi thẳng chuyện thực tế hằng ngày. Xưng 'mình', gọi 'bạn'.",
         "en": "Friendly, lightly colloquial, asks about day-to-day practicalities."

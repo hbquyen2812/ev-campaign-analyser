@@ -16,7 +16,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.82,
       suggestedReply:
-        "Dạ 80% là so tiền điện với tiền xăng ạ. Tiền điện mỗi lần sạc đầy khoảng 4.500 đ (số minh hoạ), còn thay pin khoảng 12.000.000 đ (số minh hoạ) sau khi hết bảo hành 3 năm ạ.",
+        "Dạ 80% là so tiền điện với tiền xăng ạ. Tiền điện mỗi lần sạc đầy khoảng 4.500 đ (số minh họa), còn thay pin khoảng 12.000.000 đ (số minh họa) sau khi hết bảo hành 3 năm ạ.",
     },
     {
       personaId: "tinh-toan",
@@ -25,7 +25,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.55,
       suggestedReply:
-        "Dạ giá 35.000.000 đ đã gồm pin ạ (số minh hoạ). Nếu anh chọn thuê pin thì 350.000 đ/tháng ạ.",
+        "Dạ giá 35.000.000 đ đã gồm pin ạ (số minh họa). Nếu anh chọn thuê pin thì 350.000 đ/tháng ạ.",
     },
     {
       personaId: "tinh-toan",
@@ -34,7 +34,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "negative",
       risk: 0.61,
       suggestedReply:
-        "Dạ em không có số liệu giá bán lại nên không dám nói bừa ạ. Em gửi anh bảng bảo hành pin 3 năm (số minh hoạ) để anh tính giúp em ạ.",
+        "Dạ em không có số liệu giá bán lại nên không dám nói bừa ạ. Em gửi anh bảng bảo hành pin 3 năm (số minh họa) để anh tính giúp em ạ.",
     },
     {
       personaId: "lo-ngap",
@@ -43,7 +43,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.88,
       suggestedReply:
-        "Dạ xe lội nước tối đa 30 cm (số minh hoạ), chuẩn chống nước IP67 ạ. Sâu hơn mức đó chị nên dắt bộ, em nói thật để chị không gặp rủi ro ạ.",
+        "Dạ xe lội nước tối đa 30 cm (số minh họa), chuẩn chống nước IP67 ạ. Sâu hơn mức đó chị nên dắt bộ, em nói thật để chị không gặp rủi ro ạ.",
     },
     {
       personaId: "lo-ngap",
@@ -52,7 +52,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "negative",
       risk: 0.79,
       suggestedReply:
-        "Dạ chị sạc ở nơi thoáng, không che kín, và rút sạc khi đầy ạ. Thời gian sạc đầy khoảng 6 giờ (số minh hoạ) nên chị canh được, không cần cắm cả đêm ạ.",
+        "Dạ chị sạc ở nơi thoáng, không che kín, và rút sạc khi đầy ạ. Thời gian sạc đầy khoảng 6 giờ (số minh họa) nên chị canh được, không cần cắm cả đêm ạ.",
     },
     {
       personaId: "lo-ngap",
@@ -61,7 +61,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.5,
       suggestedReply:
-        "Dạ em hiểu lo lắng của chị ạ. Quãng đường mỗi lần sạc 120 km (số minh hoạ), chị đi học về trong thành phố thì dư ạ.",
+        "Dạ em hiểu lo lắng của chị ạ. Quãng đường mỗi lần sạc 120 km (số minh họa), chị đi học về trong thành phố thì dư ạ.",
     },
     {
       personaId: "sinh-vien",
@@ -70,7 +70,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.74,
       suggestedReply:
-        "Hiện có 150 điểm sạc công cộng (số minh hoạ) bạn nhé. Bạn cho mình biết khu trọ, mình gửi danh sách điểm gần nhất ạ.",
+        "Hiện có 150 điểm sạc công cộng (số minh họa) bạn nhé. Bạn cho mình biết khu trọ, mình gửi danh sách điểm gần nhất ạ.",
     },
     {
       personaId: "sinh-vien",
@@ -79,7 +79,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "positive",
       risk: 0.18,
       suggestedReply:
-        "Quãng đường mỗi lần sạc là 120 km (số minh hoạ), bạn chạy 10 km/ngày thì khoảng hơn một tuần mới sạc lại ạ.",
+        "Quãng đường mỗi lần sạc là 120 km (số minh họa), bạn chạy 10 km/ngày thì khoảng hơn một tuần mới sạc lại ạ.",
     },
     {
       personaId: "sinh-vien",
@@ -97,7 +97,7 @@ export const SIMULATION_FIXTURE: SimulationResponse = {
       reaction: "skeptical",
       risk: 0.46,
       suggestedReply:
-        "Dạ pin được bảo hành 3 năm (số minh hoạ) ạ. Mức chai pin thực tế còn tuỳ cách sạc, em không có số chính xác nên không dám nói bừa ạ.",
+        "Dạ pin được bảo hành 3 năm (số minh họa) ạ. Mức chai pin thực tế còn tuỳ cách sạc, em không có số chính xác nên không dám nói bừa ạ.",
     },
   ],
   mix: { positive: 20, skeptical: 60, negative: 20 },

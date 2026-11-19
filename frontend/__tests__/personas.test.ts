@@ -17,7 +17,7 @@ describe("persona registry", () => {
 
   it("carries both languages for every displayed field", () => {
     for (const p of PERSONAS) {
-      for (const field of [p.name, p.tagline, p.situation, p.voice]) {
+      for (const field of [p.name, p.tagline, p.situation, p.voice, p.concerns]) {
         expect(field.vi.length).toBeGreaterThan(0);
         expect(field.en.length).toBeGreaterThan(0);
       }
@@ -27,7 +27,7 @@ describe("persona registry", () => {
 
 describe("spec sheet", () => {
   it("tags every unverified figure as illustrative, in both languages", () => {
-    for (const line of specSheetLines("vi")) expect(line).toContain("(số minh hoạ)");
+    for (const line of specSheetLines("vi")) expect(line).toContain("(số minh họa)");
     for (const line of specSheetLines("en")) expect(line).toContain("(illustrative)");
   });
 });
