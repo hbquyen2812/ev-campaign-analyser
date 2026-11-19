@@ -24,8 +24,21 @@ describe("parseVnNumber", () => {
 describe("extractNumbers", () => {
   it("scales magnitude words to đồng", () => {
     const [n] = extractNumbers("giá 35 triệu thôi");
-    expect(n.unitClass).toBe("currency");
+    expect(n.unitClass).toBe("vnd");
     expect(n.value).toBe(35_000_000);
+  });
+
+  it("reads English units, since the personas may answer in English", () => {
+    expect(extractNumbers("8 years")[0].unitClass).toBe("time");
+    expect(extractNumbers("8 years")[0].value).toBe(96);
+    expect(extractNumbers("6 hours")[0].unitClass).toBe("time");
+  });
+
+  it("reads a leading currency symbol and keeps dollars apart from đồng", () => {
+    const [n] = extractNumbers("saving $600 a month");
+    expect(n.unitClass).toBe("usd");
+    expect(n.value).toBe(600);
+    expect(n.raw).toBe("$600");
   });
   it("keeps unknown words out of the unit", () => {
     const [n] = extractNumbers("có 3 lý do");
@@ -56,6 +69,17 @@ describe("findUnsupportedNumbers", () => {
     const bad = findUnsupportedNumbers("Pin bảo hành 8 năm ạ.", allowed);
     expect(bad).toHaveLength(1);
     expect(bad[0].raw).toBe("8 năm");
+  });
+
+  it("flags the same invented warranty written in English", () => {
+    const bad = findUnsupportedNumbers("The battery is covered for 8 years.", allowed);
+    expect(bad).toHaveLength(1);
+    expect(bad[0].raw).toBe("8 years");
+  });
+
+  it("accepts a sheet figure restated in the other language", () => {
+    // Sheet: "3 năm" and "6 giờ". Reply: English. Same quantity, so no flag.
+    expect(findUnsupportedNumbers("Covered for 3 years, charges in 6 hours.", allowed)).toHaveLength(0);
   });
 
   it("does not let a matching value in another unit pass", () => {

@@ -80,7 +80,7 @@ temp/
 *.crt
 secrets/
 credentials/
-
+lakehouse/
 # Collected and derived data
 data/
 datasets/

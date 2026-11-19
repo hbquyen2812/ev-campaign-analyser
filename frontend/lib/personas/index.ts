@@ -55,6 +55,7 @@ const RULES: Record<Lang, string[]> = {
     "CHỈ dùng con số có trong bảng thông số hoặc trong chính bài đăng. Không có số phù hợp thì viết chữ, tuyệt đối không bịa số.",
     "suggestedReply là câu người bán nên trả lời: lịch sự, có con số lấy từ bảng thông số, và nói thật về giới hạn nếu có.",
     "reaction: \"positive\" nếu khen, \"skeptical\" nếu nghi ngờ hoặc hỏi vặn, \"negative\" nếu chê.",
+    "Nếu bài đăng trả lời trúng nỗi lo lớn nhất của nhân vật, hãy để họ khen thật lòng. Đừng ép mọi bình luận đều phải nghi ngờ.",
     "risk: 0 đến 1, ước lượng khả năng người khác vào hùa theo bình luận này.",
   ],
   en: [
@@ -66,6 +67,7 @@ const RULES: Record<Lang, string[]> = {
     "ONLY use figures that appear in the spec sheet or in the post itself. If none fits, use words — never invent a number.",
     "suggestedReply is what the seller should answer: polite, carrying a figure from the spec sheet, and honest about limits.",
     "reaction: \"positive\" for praise, \"skeptical\" for doubt or pushback, \"negative\" for criticism.",
+    "If the post genuinely answers this character's biggest worry, let them say so. Do not force every comment to be critical.",
     "risk: 0 to 1, how likely other viewers pile onto this comment.",
   ],
 };
