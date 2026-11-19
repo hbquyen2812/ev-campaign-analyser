@@ -49,6 +49,7 @@ export interface PersonaPromptInput {
 
 const RULES: Record<Lang, string[]> = {
   vi: [
+    "Viết mọi bình luận và câu trả lời bằng TIẾNG VIỆT.",
     "Viết đúng giọng của nhân vật trên, không viết giọng nhân viên marketing.",
     "Mỗi bình luận tối đa 2 câu, như người thật gõ vội dưới bài đăng.",
     "CHỈ dùng con số có trong bảng thông số hoặc trong chính bài đăng. Không có số phù hợp thì viết chữ, tuyệt đối không bịa số.",
@@ -57,6 +58,9 @@ const RULES: Record<Lang, string[]> = {
     "risk: 0 đến 1, ước lượng khả năng người khác vào hùa theo bình luận này.",
   ],
   en: [
+    // The seed quotes stay in Vietnamese on purpose — they carry the voice. Without
+    // this first rule the model follows them into Vietnamese and ignores `lang`.
+    "Write every comment and reply in ENGLISH, even though the sample comments below are in Vietnamese.",
     "Write in the character's voice, never in a marketer's voice.",
     "At most two sentences per comment, the way a real person types under a post.",
     "ONLY use figures that appear in the spec sheet or in the post itself. If none fits, use words — never invent a number.",
