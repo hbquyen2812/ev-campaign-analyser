@@ -11,7 +11,17 @@ describe("persona registry", () => {
     // This is the answer to "how do you know the personas match real people?".
     for (const p of PERSONAS) {
       expect(p.seedQuotes.length).toBeGreaterThan(0);
-      for (const q of p.seedQuotes) expect(q.postId).toMatch(/^(yt|x|rd)_/);
+      for (const q of p.seedQuotes) {
+        // Comments cite a 64-char interaction_id, posts cite a post_id.
+        const pattern = q.kind === "comment" ? /^[0-9a-f]{64}$/ : /^(yt|x|rd)_/;
+        expect(q.sourceId).toMatch(pattern);
+      }
+    }
+  });
+
+  it("backs each persona with at least one real reader comment", () => {
+    for (const p of PERSONAS) {
+      expect(p.seedQuotes.some((q) => q.kind === "comment")).toBe(true);
     }
   });
 

@@ -1,9 +1,17 @@
 {
   "version": 1,
   "groundedOn": {
-    "corpus": "annotation_marketing/all_posts_raw.jsonl",
-    "viPosts": 1043,
-    "note": "Quotes are verbatim excerpts from Vietnamese EV posts in the corpus. post_id lets anyone re-check the source line."
+    "comments": {
+      "table": "lakehouse.silver.interactions",
+      "distinctRows": 3081,
+      "usableComments": 265,
+      "note": "Real reader comments from Reddit and X. 2569 of the 3081 distinct rows carry no text and 231 more are scraper artefacts, which is why only 265 are quotable. sourceId is interaction_id."
+    },
+    "posts": {
+      "corpus": "annotation_marketing/all_posts_raw.jsonl",
+      "viPosts": 1043,
+      "note": "Vietnamese EV posts. Used where no real comment covers the concern — flooded streets and rented-room charging are local worries the English comment set does not reach. sourceId is post_id."
+    }
   },
   "personas": [
     {
@@ -28,14 +36,16 @@
       },
       "seedQuotes": [
         {
-          "text": "tiết kiệm được 1,1 chiệu (tiết kiệm 22% tiền xăng)",
-          "postId": "yt_vi_-SLcbMJ-IEA",
-          "platform": "youtube"
+          "text": "Saving $600 per month in gas, diesel, DEF, and oil changes and have a truck w 460 miles in range. With updated utility rate that starts tomorrow, will be $750 per month.",
+          "kind": "comment",
+          "sourceId": "dd97a02c3175c569a44bc6e2ef0382d43fdaceea7dac53a849d242f33910b38b",
+          "platform": "reddit"
         },
         {
-          "text": "Xe điện có thực sự rẻ hơn xe xăng như nhiều người nghĩ?",
-          "postId": "yt_vi_1eO_hjII12s",
-          "platform": "youtube"
+          "text": "Yes, but when I spend $7650 on a 2010 Honda civic hybrid that's at 80,000 mileage, there's absolutely no problem at all after I've driven it for years.",
+          "kind": "comment",
+          "sourceId": "8445b49f89922e9cabd39d017e41b0c1964bfa7baf4743c10532680b16de9c8f",
+          "platform": "reddit"
         }
       ],
       "openingQuestions": {
@@ -69,13 +79,27 @@
       },
       "seedQuotes": [
         {
+          "text": "Reputation and reliability clearly matter way more than spec sheets to Norwegian buyers.",
+          "kind": "comment",
+          "sourceId": "01c09142887cfb7d237cf296ea5bd5115d3d688d90de4b95a70e378d5d0850e4",
+          "platform": "reddit"
+        },
+        {
+          "text": "If you live in an area that gets lots of rain, and plenty of road salt in the winter, then they will get deep rust if you don't brake hard reguarly.",
+          "kind": "comment",
+          "sourceId": "9c2a6da4f2240e04e9f87e6c4eddf8c2364b9a9c8eecd65ee594f74ba3216787",
+          "platform": "reddit"
+        },
+        {
           "text": "Xe máy điện mà gặp ngập nước như Clip chạy được không?",
-          "postId": "x_vi_1977258545981661611",
+          "kind": "post",
+          "sourceId": "x_vi_1977258545981661611",
           "platform": "x"
         },
         {
           "text": "Độ bền kém khi gặp nước — dễ hỏng khi ngập nước hoặc trời mưa nếu không đạt chuẩn chống nước cao.",
-          "postId": "x_vi_1946478169852461207",
+          "kind": "post",
+          "sourceId": "x_vi_1946478169852461207",
           "platform": "x"
         }
       ],
@@ -110,14 +134,28 @@
       },
       "seedQuotes": [
         {
-          "text": "Vì an toàn cho PCCC nên tp hcm hiếm chung cư, căn hộ cho thuê, nhà trọ.. cho phép cư dân sạc pin xe điện tại nơi gửi xe!",
-          "postId": "x_vi_1959040525669187972",
-          "platform": "x"
+          "text": "I live in CA in an apartment. True cost of ownership still has the EV cheaper to own, though energy cost per mile can dip into the high 20 MPG equivalent.",
+          "kind": "comment",
+          "sourceId": "902478ea82edb492bf5430cf043b9322fa8120764bb9941b341d94a4746aeb5a",
+          "platform": "reddit"
         },
         {
-          "text": "Mua xe điện Geely sạc ở đâu?",
-          "postId": "yt_vi_I0o36QtXQEQ",
-          "platform": "youtube"
+          "text": "I hope you have a garage or space at your home to install a level 2. This car is not going to be fun to own unless you have that.",
+          "kind": "comment",
+          "sourceId": "b9b1d81e19c31e05e1013a7de234778d83c7396acf6a7d67f1d6f2ca0a93f907",
+          "platform": "reddit"
+        },
+        {
+          "text": "Yeah the charge system in VN not welcome new commer. Charging stations from all providers other than Vinfast are open to all EV, including Vinfast.",
+          "kind": "comment",
+          "sourceId": "00c57c3ba86d386ea2ad22c81af172875bda9f93d8e8e4eace19c7fb0bb79294",
+          "platform": "reddit"
+        },
+        {
+          "text": "Vì an toàn cho PCCC nên tp hcm hiếm chung cư, căn hộ cho thuê, nhà trọ.. cho phép cư dân sạc pin xe điện tại nơi gửi xe!",
+          "kind": "post",
+          "sourceId": "x_vi_1959040525669187972",
+          "platform": "x"
         }
       ],
       "openingQuestions": {

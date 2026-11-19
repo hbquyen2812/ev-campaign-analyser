@@ -68,7 +68,10 @@ export type Localized = Record<Lang, string>;
 export interface PersonaQuote {
   /** Verbatim excerpt from the EV corpus — this is what grounds the persona. */
   text: string;
-  postId: string;
+  /** "comment" = a real reader comment; "post" = the body of a published post. */
+  kind: "comment" | "post";
+  /** interaction_id for comments, post_id for posts, so the source row can be re-read. */
+  sourceId: string;
   platform: string;
 }
 

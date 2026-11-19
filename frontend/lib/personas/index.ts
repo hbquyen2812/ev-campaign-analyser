@@ -101,7 +101,9 @@ const SHAPE =
 /** Build the role-play prompt for one persona. */
 export function buildPersonaPrompt({ persona, post, lang, count }: PersonaPromptInput): string {
   const h = HEADINGS[lang];
-  const quotes = persona.seedQuotes.map((q) => `- "${q.text}" (${q.postId})`);
+  // The source ids stay in personas.json for traceability but are left out here:
+  // a 64-character hash tells the model nothing and costs tokens on every call.
+  const quotes = persona.seedQuotes.map((q) => `- "${q.text}"`);
   return [
     h.role,
     "",
