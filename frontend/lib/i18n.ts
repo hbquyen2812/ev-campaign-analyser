@@ -97,7 +97,7 @@ const en: Dict = {
   "cmp.clicknet": "Click a network to see its full breakdown below.",
   "cmp.viralprob": "Viral probability",
   "cmp.confidence": "Confidence",
-  "cmp.conf.sub": "distance from the 0.5 threshold",
+  "cmp.conf.sub": "distance from the {0} threshold",
   "cmp.platrel": "Platform reliability",
   "cmp.rel.on": "ROC-AUC on {0}",
   "cmp.rel.overall": "overall ROC-AUC",
@@ -285,8 +285,8 @@ const en: Dict = {
 
   // ---- Glossary tooltips ----
   "gloss.probability": "Estimated chance the post goes viral, from the model (0-100%).",
-  "gloss.confidence": "How sure the model is about its call — based on how far the score is from the 0.5 threshold.",
-  "gloss.threshold": "Decision line: at or above 0.5 the post is labelled viral-likely, below it not-viral.",
+  "gloss.confidence": "How sure the model is about its call — based on how far the score is from the {0} threshold.",
+  "gloss.threshold": "Decision line: at or above {0} the post is labelled viral-likely, below it not-viral.",
   "gloss.reliability": "How well the model performs on this platform (ROC-AUC on the test set). Lower = take the result with a pinch of salt.",
   "gloss.factors": "The features that pushed the score up (green) or down (amber), ranked by impact (SHAP).",
   "gloss.audience": "Follower / subscriber count of the account posting. Bigger audience usually means more reach.",
@@ -407,7 +407,7 @@ const vi: Dict = {
   "cmp.clicknet": "Nhấp vào một mạng để xem phân tích đầy đủ bên dưới.",
   "cmp.viralprob": "Xác suất lan truyền",
   "cmp.confidence": "Độ tự tin",
-  "cmp.conf.sub": "khoảng cách so với ngưỡng 0.5",
+  "cmp.conf.sub": "khoảng cách so với ngưỡng {0}",
   "cmp.platrel": "Độ tin cậy nền tảng",
   "cmp.rel.on": "ROC-AUC trên {0}",
   "cmp.rel.overall": "ROC-AUC tổng thể",
@@ -596,8 +596,8 @@ const vi: Dict = {
 
   // ---- Glossary tooltips ----
   "gloss.probability": "Khả năng ước tính bài viết lan truyền, theo mô hình (0-100%).",
-  "gloss.confidence": "Mức độ chắc chắn của mô hình — dựa trên khoảng cách của điểm số so với ngưỡng 0.5.",
-  "gloss.threshold": "Ngưỡng quyết định: từ 0.5 trở lên bài được gắn nhãn có khả năng lan truyền, dưới mức đó là khó lan truyền.",
+  "gloss.confidence": "Mức độ chắc chắn của mô hình — dựa trên khoảng cách của điểm số so với ngưỡng {0}.",
+  "gloss.threshold": "Ngưỡng quyết định: từ {0} trở lên bài được gắn nhãn có khả năng lan truyền, dưới mức đó là khó lan truyền.",
   "gloss.reliability": "Mô hình hoạt động tốt ra sao trên nền tảng này (ROC-AUC trên tập kiểm tra). Thấp hơn = hãy dè dặt với kết quả.",
   "gloss.factors": "Các đặc trưng đẩy điểm lên (xanh lá) hoặc xuống (hổ phách), xếp theo mức tác động (SHAP).",
   "gloss.audience": "Số người theo dõi / đăng ký của tài khoản đăng bài. Lượng theo dõi lớn hơn thường có độ phủ cao hơn.",

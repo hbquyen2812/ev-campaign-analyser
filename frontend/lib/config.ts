@@ -3,7 +3,12 @@
 import type { PredictionModel } from "./types";
 
 // The model classifies a post as "viral-likely" when the score is at/above this.
-export const DECISION_THRESHOLD = 0.5;
+//
+// Read from the trained bundle's own `threshold`, not assumed: viral posts are a
+// small minority of the training set, so the cut sits well below a half. Keeping
+// 0.5 here made the screen label a 39% post "viral-likely" while the tooltip
+// beside it claimed the line was at 0.5.
+export const DECISION_THRESHOLD = 0.25;
 
 // Available prediction models. Add new entries here as more models are trained;
 // the analyze selector, insights page and history all read from this list.

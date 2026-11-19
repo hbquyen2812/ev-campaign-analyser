@@ -2,7 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import { BarrierResponse, Factor, GreenwashResponse, Lang, Prediction, SentimentResponse, Source } from "@/lib/types";
-import { GLOSSARY, modelReliability } from "@/lib/config";
+import { DECISION_THRESHOLD, GLOSSARY, modelReliability } from "@/lib/config";
 import { useT, factorLabel, TFunc } from "@/lib/i18n";
 
 function labelText(t: TFunc, label: string): string {
@@ -36,7 +36,7 @@ export function Icon({ name, size = 18 }: { name: keyof typeof PATHS; size?: num
 
 export function InfoTip({ term }: { term: keyof typeof GLOSSARY }) {
   const { t } = useT();
-  const text = t(`gloss.${term}`);
+  const text = t(`gloss.${term}`, String(DECISION_THRESHOLD));
   return (
     <span className="tip" tabIndex={0} aria-label={text}>
       i<span className="tip-bubble">{text}</span>
@@ -123,7 +123,7 @@ export function MetaGrid({ prediction, source }: { prediction: Prediction; sourc
       <div className="metric">
         <div className="label"><span className="ico-badge teal"><Icon name="target" size={15} /></span>{t("cmp.confidence")} <InfoTip term="confidence" /></div>
         <div className="value">{conf}%</div>
-        <div className="sub">{t("cmp.conf.sub")}</div>
+        <div className="sub">{t("cmp.conf.sub", String(DECISION_THRESHOLD))}</div>
       </div>
       <div className="metric">
         <div className="label"><span className={`ico-badge ${weak ? "amber" : "green"}`}><Icon name="shield" size={15} /></span>{t("cmp.platrel")} <InfoTip term="reliability" /></div>
