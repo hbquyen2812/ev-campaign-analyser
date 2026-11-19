@@ -582,3 +582,29 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
   .hist-row { flex-direction: column; }
   .hist-actions { flex-direction: row; align-items: center; align-self: flex-start; }
 }
+
+/* ---- Audience simulation (predicted comments) ---- */
+.sim-mix-head, .sim-list-head { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
+.sim-mix-bar { display: flex; height: 14px; border-radius: 20px; overflow: hidden; background: var(--surface-soft); }
+.sim-seg { display: block; height: 100%; }
+.sim-seg.positive, .sim-dot.positive { background: var(--accent); }
+.sim-seg.skeptical, .sim-dot.skeptical { background: var(--down); }
+.sim-seg.negative, .sim-dot.negative { background: var(--danger); }
+.sim-mix-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; color: var(--text-secondary); }
+.sim-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.sim-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.sim-toprisk { margin-top: 18px; padding: 14px 16px; border-radius: 12px; background: var(--danger-bg); }
+.sim-toprisk-head { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: .04em; }
+.sim-quote { margin: 9px 0 0; padding: 0 0 0 12px; border-left: 3px solid var(--danger); font-size: 15px; line-height: 1.55; }
+.sim-list { display: flex; flex-direction: column; gap: 12px; }
+.sim-item { padding: 13px 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.sim-item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+.sim-persona { font-size: 14px; font-weight: 600; }
+.sim-comment { font-size: 15px; line-height: 1.55; }
+.sim-reply { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--text-secondary); }
+.sim-reply strong { color: var(--text); }
+.sim-redacted { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 13px; color: var(--danger); }
+.reaction-badge.negative { background: var(--danger-bg); color: var(--danger); }
+@media (max-width: 560px) {
+  .sim-item-head { flex-direction: column; align-items: flex-start; gap: 6px; }
+}

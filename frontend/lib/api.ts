@@ -1,5 +1,5 @@
-import { BarrierResponse, GreenwashResponse, Lang, Prediction, PredictionModel, ReportJobResponse, ReportResponse, SentimentResponse, Source } from "./types";
-import { ApiError, getJson, postJson } from "./http";
+import { BarrierResponse, GreenwashResponse, Lang, Prediction, PredictionModel, ReportJobResponse, ReportResponse, SentimentResponse, SimulationResponse, Source } from "./types";
+import { ApiError, getJson, postAppJson, postJson } from "./http";
 
 const REPORT_POLL_INTERVAL_MS = 1_000;
 const REPORT_POLL_TIMEOUT_MS = 10 * 60 * 1_000;
@@ -71,4 +71,10 @@ export function getGreenwashing(text: string, lang: Lang) {
 // Likely audience reaction (via Qwen). The explanatory note is written in `lang`.
 export function getSentiment(text: string, lang: Lang) {
   return postJson<SentimentResponse>("/sentiment", { text, lang });
+}
+
+// Predicted audience reaction (mục ② ③ ④). Served by our own Next.js route, which
+// plays each persona against the post, so it does not go through the /api/ai proxy.
+export function simulateAudience(post: string, lang: Lang) {
+  return postAppJson<SimulationResponse>("/api/simulate", { post, lang });
 }

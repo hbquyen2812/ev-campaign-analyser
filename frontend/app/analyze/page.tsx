@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { predict, getReport, getBarriers, getGreenwashing, getSentiment } from "@/lib/api";
-import { Prediction, Source, Lang, BarrierResponse, GreenwashResponse, SentimentResponse, PredictionModel } from "@/lib/types";
+import { predict, getReport, getBarriers, getGreenwashing, getSentiment, simulateAudience } from "@/lib/api";
+import { Prediction, Source, Lang, BarrierResponse, GreenwashResponse, SentimentResponse, SimulationResponse, PredictionModel } from "@/lib/types";
+import { AudiencePanel } from "../AudiencePanel";
 import { MODELS, DEFAULT_MODEL_ID, modelApiId, modelName } from "@/lib/config";
 import { addHistory, consumeAnalysisDraft, updateHistory } from "@/lib/history";
 import { useLang } from "../LangContext";
@@ -69,6 +70,9 @@ export default function Analyze() {
   const [sentiment, setSentiment] = useState<SentimentResponse | null>(null);
   const [loadingSentiment, setLoadingSentiment] = useState(false);
   const [sentimentError, setSentimentError] = useState<string | null>(null);
+  const [simulation, setSimulation] = useState<SimulationResponse | null>(null);
+  const [loadingSimulation, setLoadingSimulation] = useState(false);
+  const [simulationError, setSimulationError] = useState<string | null>(null);
   const histId = useRef<string | null>(null);
   const aiPipelineBusyRef = useRef(false);
   const pendingAnalysesRef = useRef<AnalysisRequest[]>([]);
@@ -186,6 +190,19 @@ export default function Analyze() {
     }
   }
 
+  async function fetchSimulation(txt: string, reportLanguage: Lang) {
+    setLoadingSimulation(true);
+    setSimulationError(null);
+    try {
+      setSimulation(await simulateAudience(txt, reportLanguage));
+    } catch (e) {
+      setSimulation(null);
+      setSimulationError(e instanceof Error ? e.message : "unknown error");
+    } finally {
+      setLoadingSimulation(false);
+    }
+  }
+
   async function runAnalysis(request: AnalysisRequest) {
     aiPipelineBusyRef.current = true;
     setLoadingAiPipeline(true);
@@ -203,7 +220,13 @@ export default function Analyze() {
     setGreenwashError(null);
     setSentiment(null);
     setSentimentError(null);
+    setSimulation(null);
+    setSimulationError(null);
     setLoading(true);
+    // Kicked off first and never awaited: it talks to its own route rather than the
+    // Python service, so the predicted comments still arrive when scoring is down —
+    // which is exactly when a user most wants to know what the audience will say.
+    void fetchSimulation(request.text, request.lang);
     try {
       // Sequential calls: Tailscale Funnel (free tier) and the CPU can't handle
       // many requests at once — parallel calls return 502. One at a time.
@@ -363,6 +386,14 @@ export default function Analyze() {
           <div className="lbl">{t("an.preview.lbl")}</div>
           <div className="txt">{analyzedText}</div>
           <div className="tags">{t("an.preview.tags", modelName(analyzedModel), lang.toUpperCase())}</div>
+        </div>
+      )}
+
+      {/* Outside the results block on purpose: the predicted comments do not depend
+          on the viral score, so they must still show when scoring fails. */}
+      {analyzedText && (loadingSimulation || simulation || simulationError) && (
+        <div style={{ marginTop: "1.25rem" }}>
+          <AudiencePanel data={simulation} loading={loadingSimulation} error={simulationError} />
         </div>
       )}
 

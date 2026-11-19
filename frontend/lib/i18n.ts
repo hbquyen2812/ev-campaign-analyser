@@ -305,6 +305,19 @@ const en: Dict = {
   "tmpl.hook.text": "Still paying for petrol every week? Here's what switching to electric really changes.",
   "tmpl.cta.role": "Call to action",
   "tmpl.cta.text": "Book a free test drive this week and feel the difference yourself.",
+  // ---- Audience simulation (predicted comments) ----
+  "sim.title": "Predicted audience reaction",
+  "sim.loading": "Three personas are reading your post…",
+  "sim.err": "The audience preview couldn't run: {0}",
+  "sim.sample": "No model was reachable, so this is a sample run — not a reading of your post.",
+  "sim.mix.title": "Reaction split",
+  "sim.mix.positive": "Praise",
+  "sim.mix.skeptical": "Doubt",
+  "sim.mix.negative": "Criticism",
+  "sim.risk.title": "Answer this one first",
+  "sim.list.title": "All {0} predicted comments",
+  "sim.reply": "Suggested reply:",
+  "sim.redacted": "A figure not in your spec sheet was removed from this reply: {0}",
 };
 
 const vi: Dict = {
@@ -603,6 +616,19 @@ const vi: Dict = {
   "tmpl.hook.text": "Vẫn đổ xăng mỗi tuần? Đây là điều thực sự thay đổi khi chuyển sang xe điện.",
   "tmpl.cta.role": "Kêu gọi hành động",
   "tmpl.cta.text": "Đặt lịch lái thử miễn phí tuần này và tự cảm nhận sự khác biệt.",
+  // ---- Audience simulation (predicted comments) ----
+  "sim.title": "Phản ứng dự đoán của người xem",
+  "sim.loading": "Ba người dùng ảo đang đọc bài của bạn…",
+  "sim.err": "Không chạy được phần dự đoán bình luận: {0}",
+  "sim.sample": "Không kết nối được mô hình, đây là kết quả mẫu — không phải phân tích bài của bạn.",
+  "sim.mix.title": "Tỷ lệ phản ứng",
+  "sim.mix.positive": "Khen",
+  "sim.mix.skeptical": "Nghi ngờ",
+  "sim.mix.negative": "Chê",
+  "sim.risk.title": "Bình luận cần lo nhất",
+  "sim.list.title": "Tất cả {0} bình luận dự đoán",
+  "sim.reply": "Gợi ý trả lời:",
+  "sim.redacted": "Đã xoá một con số không có trong bảng thông số khỏi câu trả lời này: {0}",
 };
 
 const DICTS: Record<Lang, Dict> = { en, vi };
