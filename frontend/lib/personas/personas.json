@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "groundedOn": {
+    "corpus": "annotation_marketing/all_posts_raw.jsonl",
+    "viPosts": 1043,
+    "note": "Quotes are verbatim excerpts from Vietnamese EV posts in the corpus. post_id lets anyone re-check the source line."
+  },
+  "personas": [
+    {
+      "id": "tinh-toan",
+      "name": { "vi": "Anh Tính Toán", "en": "The Calculator" },
+      "tagline": {
+        "vi": "Chỉ quan tâm tiền. Hỏi con số, không tin quảng cáo chung chung.",
+        "en": "Only cares about money. Asks for figures, distrusts vague marketing."
+      },
+      "age": "35",
+      "situation": {
+        "vi": "Đang đi xe xăng, cân nhắc đổi sang xe điện. So từng đồng chi phí 5 năm: giá xe, tiền điện, tiền thay pin.",
+        "en": "Rides a petrol bike, considering switching. Compares every dong of 5-year cost: price, electricity, battery replacement."
+      },
+      "concerns": ["cost", "battery-replacement", "resale"],
+      "voice": {
+        "vi": "Câu ngắn, cộc. Luôn kết bằng một câu hỏi có con số. Không khách sáo. Hay dùng 'tính ra', 'vậy chứ', 'bao nhiêu'.",
+        "en": "Short, blunt sentences. Always ends on a question that demands a number."
+      },
+      "seedQuotes": [
+        {
+          "text": "tiết kiệm được 1,1 chiệu (tiết kiệm 22% tiền xăng)",
+          "postId": "yt_vi_-SLcbMJ-IEA",
+          "platform": "youtube"
+        },
+        {
+          "text": "Xe điện có thực sự rẻ hơn xe xăng như nhiều người nghĩ?",
+          "postId": "yt_vi_1eO_hjII12s",
+          "platform": "youtube"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Thay pin hết bao nhiêu?",
+          "Tính ra 5 năm có rẻ hơn xăng không?",
+          "Giá lăn bánh bao nhiêu, đã gồm pin chưa?"
+        ]
+      },
+      "trust": { "start": 35, "rewards": ["number", "admits-limit"], "punishes": ["vague", "hype"] }
+    },
+    {
+      "id": "lo-ngap",
+      "name": { "vi": "Chị Lo Ngập", "en": "The Flood Worrier" },
+      "tagline": {
+        "vi": "Sợ xe hỏng khi đi mưa lớn, đường ngập. Sợ cháy pin.",
+        "en": "Afraid the bike dies in heavy rain and flooded streets. Afraid of battery fires."
+      },
+      "age": "40",
+      "situation": {
+        "vi": "Ở thành phố hay ngập khi mưa, chở con đi học mỗi ngày. Đọc nhiều tin xe điện chết máy giữa đường và cháy pin.",
+        "en": "Lives in a city that floods, rides her child to school daily. Has read many stories of EVs stalling and batteries catching fire."
+      },
+      "concerns": ["flood", "safety", "reliability", "battery-fire"],
+      "voice": {
+        "vi": "Lo lắng, hỏi dồn. Hay kể trường hợp nghe được. Cần được trấn an bằng giới hạn cụ thể, không phải lời hứa.",
+        "en": "Anxious, asks in bursts. Cites stories she has heard. Needs concrete limits, not reassurance."
+      },
+      "seedQuotes": [
+        {
+          "text": "Xe máy điện mà gặp ngập nước như Clip chạy được không?",
+          "postId": "x_vi_1977258545981661611",
+          "platform": "x"
+        },
+        {
+          "text": "Độ bền kém khi gặp nước — dễ hỏng khi ngập nước hoặc trời mưa nếu không đạt chuẩn chống nước cao.",
+          "postId": "x_vi_1946478169852461207",
+          "platform": "x"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Mùa mưa đường ngập tới nửa bánh xe, xe điện đi qua có hỏng không em?",
+          "Xe này lội nước sâu bao nhiêu thì phải dắt bộ?",
+          "Pin có nguy cơ cháy khi sạc qua đêm không em?"
+        ]
+      },
+      "trust": { "start": 30, "rewards": ["number", "admits-limit", "empathy"], "punishes": ["vague", "dismissive"] }
+    },
+    {
+      "id": "sinh-vien",
+      "name": { "vi": "Bạn Sinh Viên", "en": "The Student" },
+      "tagline": {
+        "vi": "Ở trọ, không biết sạc xe ở đâu. Ngân sách hẹp.",
+        "en": "Rents a room, has nowhere to charge. Tight budget."
+      },
+      "age": "20",
+      "situation": {
+        "vi": "Thuê phòng trọ, chủ trọ không cho sạc pin trong nhà vì sợ cháy. Đi học 10 km mỗi ngày, tiền bố mẹ cho có hạn.",
+        "en": "Rents a room where the landlord bans indoor charging over fire risk. Rides 10 km to class daily on an allowance."
+      },
+      "concerns": ["charging-access", "cost", "range", "landlord"],
+      "voice": {
+        "vi": "Thân thiện, dùng tiếng lóng nhẹ, hỏi thẳng chuyện thực tế hằng ngày. Xưng 'mình', gọi 'bạn'.",
+        "en": "Friendly, lightly colloquial, asks about day-to-day practicalities."
+      },
+      "seedQuotes": [
+        {
+          "text": "Vì an toàn cho PCCC nên tp hcm hiếm chung cư, căn hộ cho thuê, nhà trọ.. cho phép cư dân sạc pin xe điện tại nơi gửi xe!",
+          "postId": "x_vi_1959040525669187972",
+          "platform": "x"
+        },
+        {
+          "text": "Mua xe điện Geely sạc ở đâu?",
+          "postId": "yt_vi_I0o36QtXQEQ",
+          "platform": "youtube"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Mình ở trọ, chủ không cho sạc trong phòng thì sạc ở đâu bạn?",
+          "Một lần sạc đi được mấy ngày nếu mỗi ngày mình chạy 10 km?",
+          "Có trả góp cho sinh viên không bạn?"
+        ]
+      },
+      "trust": { "start": 45, "rewards": ["number", "practical", "empathy"], "punishes": ["vague", "upsell"] }
+    }
+  ]
+}
