@@ -608,3 +608,44 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
 @media (max-width: 560px) {
   .sim-item-head { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+
+/* ---- Sales coach (practice chat) ---- */
+.coach-picker { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 18px 0 20px; }
+.coach-chip { text-align: left; padding: 13px 15px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.coach-chip:hover { border-color: var(--accent); }
+.coach-chip.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.coach-chip-name { display: block; font-size: 15px; font-weight: 600; }
+.coach-chip-sub { display: block; margin-top: 4px; font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+.coach-trust-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--text-secondary); }
+.coach-trust-value { font-size: 20px; font-weight: 700; color: var(--text); }
+.coach-delta { margin-left: 8px; font-size: 14px; font-weight: 600; }
+.coach-delta.up { color: var(--accent-dark); }
+.coach-delta.down { color: var(--danger); }
+.coach-trust-bar { height: 12px; margin: 9px 0 16px; border-radius: 20px; background: var(--surface-soft); overflow: hidden; }
+.coach-trust-fill { display: block; height: 100%; border-radius: 20px; transition: width .45s ease, background-color .45s ease; }
+.coach-trust-fill.high { background: var(--accent); }
+.coach-trust-fill.mid { background: var(--down); }
+.coach-trust-fill.low { background: var(--danger); }
+.coach-thread { display: flex; flex-direction: column; gap: 14px; max-height: 420px; overflow-y: auto; padding: 4px 2px; }
+.coach-turn { max-width: 78%; }
+.coach-turn.customer { align-self: flex-start; }
+.coach-turn.seller { align-self: flex-end; text-align: right; }
+.coach-who { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+.coach-bubble { display: inline-block; padding: 11px 14px; border-radius: 14px; font-size: 15px; line-height: 1.55; text-align: left; }
+.coach-turn.customer .coach-bubble { background: var(--surface-soft); border-bottom-left-radius: 4px; }
+.coach-turn.seller .coach-bubble { background: var(--accent-bg); color: var(--accent-dark); border-bottom-right-radius: 4px; }
+.coach-compose { display: flex; gap: 10px; align-items: flex-end; margin-top: 16px; }
+.coach-compose textarea { flex: 1; resize: vertical; min-height: 64px; padding: 11px 13px; border: 1px solid var(--border); border-radius: 12px; font: inherit; font-size: 15px; background: var(--surface); color: var(--text); }
+.coach-compose textarea:focus { outline: none; border-color: var(--accent); }
+.coach-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.coach-tag { font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+.coach-tag.good { background: var(--accent-bg); color: var(--accent-dark); }
+.coach-tag.bad { background: var(--down-bg); color: var(--down); }
+.coach-feedback { margin: 0 0 12px; font-size: 15px; line-height: 1.6; }
+.coach-invented { display: flex; align-items: center; gap: 7px; margin-bottom: 12px; padding: 10px 13px; border-radius: 10px; background: var(--danger-bg); color: var(--danger); font-size: 14px; }
+.coach-model-head { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 7px; }
+.coach-model { margin: 0; padding: 0 0 0 13px; border-left: 3px solid var(--accent); font-size: 15px; line-height: 1.6; }
+@media (max-width: 560px) {
+  .coach-turn { max-width: 92%; }
+  .coach-compose { flex-direction: column; align-items: stretch; }
+}

@@ -112,3 +112,33 @@ export interface SimulationResponse {
   backend: "llm" | "template";
   warning?: string;
 }
+
+// ---- Sales coach (practice chat) ----
+/** What a seller's answer did right. Each one earns trust. */
+export type CoachStrength = "number" | "admits-limit" | "specific" | "empathy" | "practical";
+/** What it did wrong. Each one costs trust. */
+export type CoachWeakness = "vague" | "hype" | "dismissive" | "upsell";
+
+export interface CoachTurn {
+  role: "customer" | "seller";
+  text: string;
+}
+
+export interface CoachResponse {
+  /** The persona's next line. */
+  reply: string;
+  /** Trust after this answer, 0-100. */
+  trust: number;
+  /** Change from the previous turn — what the bar animates. */
+  trustDelta: number;
+  strengths: CoachStrength[];
+  weaknesses: CoachWeakness[];
+  /** One short sentence on how the answer landed. */
+  feedback: string;
+  /** A better answer to learn from. */
+  modelAnswer: string;
+  /** Figures the seller quoted that the spec sheet does not support. */
+  unsupportedNumbers?: string[];
+  backend: "llm" | "template";
+  warning?: string;
+}
