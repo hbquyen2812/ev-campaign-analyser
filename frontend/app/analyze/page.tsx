@@ -23,6 +23,13 @@ interface AnalysisRequest {
 interface QueueToast { id: number; title: string; message: string; }
 const NETWORKS: Source[] = ["youtube", "x", "reddit"];
 
+// The barrier, greenwashing and sentiment cards call /barriers, /greenwashing and
+// /sentiment, which the Python service has never implemented — a known gap recorded
+// in docs/RUNNING.md when this frontend was imported. Until someone writes them, the
+// cards can only render three error boxes, so they stay off and the requests are not
+// made. Flip this to true the moment the endpoints exist; nothing else has to change.
+const SECONDARY_CARDS_ENABLED = false;
+
 const EXAMPLE_KEYS = [
   { label: "ex.range", text: "ex.range.txt" },
   { label: "ex.charging", text: "ex.charging.txt" },
@@ -249,9 +256,11 @@ export default function Analyze() {
       });
       // Run the LLM analyses one after another (avoids 502s through the Funnel
       // and CPU contention). Fast 3B cards first, then the slower 7B report.
-      await fetchBarriers(request.text);
-      await fetchGreenwash(request.text, request.lang);
-      await fetchSentiment(request.text, request.lang);
+      if (SECONDARY_CARDS_ENABLED) {
+        await fetchBarriers(request.text);
+        await fetchGreenwash(request.text, request.lang);
+        await fetchSentiment(request.text, request.lang);
+      }
       await fetchReport(request.text, best.source, best.audience, request.lang, request.apiModel);
       updateHistory(request.historyId, { status: "completed" });
     } catch (e) {
@@ -408,13 +417,17 @@ export default function Analyze() {
                 <MetaGrid prediction={sel.prediction} source={selected} />
               </div>
               <SummaryBox factors={sel.prediction.top_factors} />
-              <div className="cols">
-                <BarrierRadar data={barriers} loading={loadingBarriers} error={barriersError} />
-                <GreenwashCard data={greenwash} loading={loadingGreenwash} error={greenwashError} />
-              </div>
-              <div style={{ marginBottom: "1.25rem" }}>
-                <SentimentCard data={sentiment} loading={loadingSentiment} error={sentimentError} />
-              </div>
+              {SECONDARY_CARDS_ENABLED && (
+                <>
+                  <div className="cols">
+                    <BarrierRadar data={barriers} loading={loadingBarriers} error={barriersError} />
+                    <GreenwashCard data={greenwash} loading={loadingGreenwash} error={greenwashError} />
+                  </div>
+                  <div style={{ marginBottom: "1.25rem" }}>
+                    <SentimentCard data={sentiment} loading={loadingSentiment} error={sentimentError} />
+                  </div>
+                </>
+              )}
               <div className="stack">
                 <FactorBars factors={sel.prediction.top_factors} />
                 <ReportPanel
