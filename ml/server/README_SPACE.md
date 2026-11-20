@@ -30,9 +30,26 @@ of the Spark, Airflow or collector code.
 
 ### What the image needs
 
-`ml/models/*.joblib` must be present — the Space builds from Git, so the models
-have to be committed. They are about 4.4 MB and the repository tracks them
-explicitly, overriding the `*.joblib` ignore rule.
+`ml/models/*.joblib` must be present in the Space, and these are **not** in the
+GitHub repository. Upload them to the Space repository directly — a Space is its
+own git remote, so `git add` them there and nowhere else:
+
+```
+ml/models/stage1_multisource.joblib
+ml/models/stage1_multisource_audience_x90.joblib
+ml/models/topic_model.joblib
+ml/models/rhetorical_role.joblib
+```
+
+They stay out of GitHub on purpose. `tests/scripts/test_serve_train_parity.py`
+skips when the artefacts are absent and runs when they are present, and it
+currently fails against them: the official model is contracted to exclude
+audience features because the value is collected after publication and cannot be
+proven to predate it, yet all three `stage1_multisource*` variants carry
+`chan_audience_available`, `chan_audience_is_zero`, `chan_has_audience` and
+`chan_log_audience`. Committing the files turned a skipped guard into a red
+build. The guard is right; the artefacts predate it. Retraining is the fix, and
+it is not a deployment task.
 
 `xgboost==3.0.5` is pinned deliberately: 3.3.0 cannot deserialise these boosters
 and fails with `XGBoostError: input stream corrupted` on the first prediction,
