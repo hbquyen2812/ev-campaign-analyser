@@ -125,6 +125,47 @@ describe("coachTurn", () => {
     expect(result.strengths).not.toContain("number");
   });
 
+  it("blanks figures the model worked out for the answer it tells you to copy", async () => {
+    // Seen live: "resale around 24,500,000 d at 70% of the purchase price" — neither
+    // figure is on the sheet, both derived from the 35,000,000 price. This is the text
+    // a salesperson is most likely to paste to a real customer.
+    mockedComplete.mockResolvedValue(reply({
+      modelAnswer: "Resale after 5 years is about 24.500.000 d, roughly 70% of the purchase price.",
+    }) as never);
+    const result = await coachTurn({
+      personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",
+    });
+    expect(result.modelAnswer).not.toContain("24.500.000");
+    expect(result.modelAnswer).not.toContain("70%");
+    // Not shown with gaps punched in it either — a trainee cannot copy half a
+    // sentence, so they get the move to make when the sheet has nothing.
+    expect(result.modelAnswer).not.toContain("…");
+    expect(result.modelAnswer).toContain("spec sheet has no figure");
+  });
+
+  it("keeps a grounded answer, blanking only the stray figure in it", async () => {
+    // Replacing wholesale threw away a correct "replacement costs 12.000.000 đ"
+    // because the model had tacked one unsupported year onto the end.
+    mockedComplete.mockResolvedValue(reply({
+      modelAnswer: "A replacement is 12.000.000 đ, and the pack lasts about 9 years.",
+    }) as never);
+    const result = await coachTurn({
+      personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",
+    });
+    expect(result.modelAnswer).toContain("12.000.000");
+    expect(result.modelAnswer).not.toContain("9 years");
+    expect(result.modelAnswer).not.toContain("spec sheet has no figure");
+  });
+
+  it("leaves a model answer that only quotes the sheet alone", async () => {
+    const answer = "The battery is covered for 3 years and a replacement is 12.000.000 đ.";
+    mockedComplete.mockResolvedValue(reply({ modelAnswer: answer }) as never);
+    const result = await coachTurn({
+      personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",
+    });
+    expect(result.modelAnswer).toBe(answer);
+  });
+
   it("falls back to an opening question when the model sends no reply", async () => {
     mockedComplete.mockResolvedValue(reply({ reply: "  " }) as never);
     const result = await coachTurn({
