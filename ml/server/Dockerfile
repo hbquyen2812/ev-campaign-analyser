@@ -18,5 +18,8 @@ COPY . /app
 
 # The trained model must be available at runtime; bind-mount it if it is not baked in:
 #   docker run -p 8000:8000 -v $PWD/ml/models:/app/models ai-server
+# Hosts tell the container which port to listen on: Hugging Face Spaces uses 7860,
+# Railway and Render inject $PORT. Shell form so the variable is expanded at run
+# time rather than baked in at build; the default keeps local runs unchanged.
 EXPOSE 8000
-CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn server.app:app --host 0.0.0.0 --port ${PORT:-8000}

@@ -2,7 +2,9 @@
 pandas==3.0.3
 numpy==2.4.6
 scikit-learn==1.9.0
-xgboost==3.3.0
+# 3.3.0 cannot deserialise the boosters in ml/models: XGBoostError "input stream
+# corrupted". 3.0.5, 2.1.4 and 2.0.3 all read them; this is the closest that works.
+xgboost==3.0.5
 pyarrow==24.0.0
 joblib==1.5.3
 matplotlib==3.10.5
