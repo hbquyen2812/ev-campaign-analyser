@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { coachTurn } from "@/lib/api";
-import { PERSONAS } from "@/lib/personas";
+import { PERSONAS, SPEC_SHEET } from "@/lib/personas";
 import { GENERATION_LANG } from "@/lib/config";
 import type { CoachResponse, CoachTurn } from "@/lib/types";
 import { useLang } from "../LangContext";
@@ -29,6 +29,7 @@ export default function Coach() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
+  const [round, setRound] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
 
   const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0];
@@ -42,7 +43,7 @@ export default function Coach() {
     setCoaching(null);
     setError(null);
     setWarning(null);
-  }, [personaId, persona]);
+  }, [personaId, persona, round]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -99,6 +100,22 @@ export default function Coach() {
         ))}
       </div>
 
+      {/* The trainee is scored on quoting figures, so they have to be able to read
+          them. Without this they were being marked down for numbers they had no way
+          to look up, and the bar only ever went one direction. */}
+      <details className="coach-sheet">
+        <summary>{t("co.sheet", SPEC_SHEET.items.length)}</summary>
+        <div className="coach-sheet-grid">
+          {SPEC_SHEET.items.map((item) => (
+            <div className="coach-sheet-row" key={item.key}>
+              <span>{item.label[lang]}</span>
+              <strong>{item.value}{item.unit[lang] ? ` ${item.unit[lang]}` : ""}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="coach-sheet-note">{SPEC_SHEET.disclaimer[lang]}</div>
+      </details>
+
       <div className="card">
         <div className="coach-trust-head">
           <span>{t("co.trust", persona.name[lang])}</span>
@@ -115,6 +132,14 @@ export default function Coach() {
           <span className={`coach-trust-fill ${trustTone}`} style={{ width: `${trust}%` }} />
         </div>
 
+        {/* Zero is an outcome, not a glitch: say the customer gave up and offer a
+            fresh start, rather than leaving a dead red bar on screen. */}
+        {trust === 0 && (
+          <div className="coach-lost">
+            <span>{t("co.lost", persona.name[lang])}</span>
+            <button className="btn btn-ghost" onClick={() => setRound((r) => r + 1)}>{t("co.restart")}</button>
+          </div>
+        )}
         {warning && <div className="warn">{warning}</div>}
         {error && <div className="error">{t("co.err", error)}</div>}
 
@@ -142,9 +167,14 @@ export default function Coach() {
             placeholder={t("co.placeholder")}
             rows={3}
           />
-          <button className="btn" onClick={() => void send()} disabled={loading || !draft.trim()}>
-            {loading ? t("co.sending") : t("co.send")}
-          </button>
+          <div className="coach-actions">
+            <button className="btn" onClick={() => void send()} disabled={loading || !draft.trim()}>
+              {loading ? t("co.sending") : t("co.send")}
+            </button>
+            <button className="btn btn-ghost" onClick={() => setRound((r) => r + 1)} disabled={loading}>
+              {t("co.restart")}
+            </button>
+          </div>
         </div>
       </div>
 

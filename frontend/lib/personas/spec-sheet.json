@@ -1,20 +1,143 @@
 {
   "version": 1,
-  "product": { "vi": "Xe máy điện phổ thông (bản demo)", "en": "Mass-market electric motorbike (demo)" },
+  "product": {
+    "vi": "Xe máy điện phổ thông (bản demo)",
+    "en": "Mass-market electric motorbike (demo)"
+  },
   "disclaimer": {
     "vi": "Mọi con số dưới đây là SỐ MINH HOẠ cho bản demo, chưa đối chiếu với thông số nhà sản xuất. Thay bằng số thật trước khi dùng cho khách hàng.",
     "en": "Every figure below is an ILLUSTRATIVE demo value, not verified against manufacturer specs. Replace with real figures before customer use."
   },
   "items": [
-    { "key": "price", "label": { "vi": "Giá xe (đã gồm pin)", "en": "Price (battery included)" }, "value": "35.000.000", "unit": "đ", "illustrative": true },
-    { "key": "range", "label": { "vi": "Quãng đường mỗi lần sạc", "en": "Range per charge" }, "value": "120", "unit": "km", "illustrative": true },
-    { "key": "charge-time", "label": { "vi": "Thời gian sạc đầy", "en": "Full charge time" }, "value": "6", "unit": "giờ", "illustrative": true },
-    { "key": "battery-warranty", "label": { "vi": "Bảo hành pin", "en": "Battery warranty" }, "value": "3", "unit": "năm", "illustrative": true },
-    { "key": "battery-rental", "label": { "vi": "Giá thuê pin mỗi tháng", "en": "Battery rental per month" }, "value": "350.000", "unit": "đ", "illustrative": true },
-    { "key": "battery-replace", "label": { "vi": "Chi phí thay pin", "en": "Battery replacement cost" }, "value": "12.000.000", "unit": "đ", "illustrative": true },
-    { "key": "wading-depth", "label": { "vi": "Lội nước tối đa", "en": "Maximum wading depth" }, "value": "30", "unit": "cm", "illustrative": true },
-    { "key": "ip-rating", "label": { "vi": "Chuẩn chống nước", "en": "Water resistance rating" }, "value": "IP67", "unit": "", "illustrative": true },
-    { "key": "charge-cost", "label": { "vi": "Tiền điện mỗi lần sạc đầy", "en": "Electricity per full charge" }, "value": "4.500", "unit": "đ", "illustrative": true },
-    { "key": "public-stations", "label": { "vi": "Số điểm sạc công cộng", "en": "Public charging points" }, "value": "150", "unit": "điểm", "illustrative": true }
+    {
+      "key": "price",
+      "label": {
+        "vi": "Giá xe (đã gồm pin)",
+        "en": "Price (battery included)"
+      },
+      "value": "35.000.000",
+      "unit": {
+        "vi": "đ",
+        "en": "đ"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "range",
+      "label": {
+        "vi": "Quãng đường mỗi lần sạc",
+        "en": "Range per charge"
+      },
+      "value": "120",
+      "unit": {
+        "vi": "km",
+        "en": "km"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "charge-time",
+      "label": {
+        "vi": "Thời gian sạc đầy",
+        "en": "Full charge time"
+      },
+      "value": "6",
+      "unit": {
+        "vi": "giờ",
+        "en": "h"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "battery-warranty",
+      "label": {
+        "vi": "Bảo hành pin",
+        "en": "Battery warranty"
+      },
+      "value": "3",
+      "unit": {
+        "vi": "năm",
+        "en": "years"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "battery-rental",
+      "label": {
+        "vi": "Giá thuê pin mỗi tháng",
+        "en": "Battery rental per month"
+      },
+      "value": "350.000",
+      "unit": {
+        "vi": "đ",
+        "en": "đ"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "battery-replace",
+      "label": {
+        "vi": "Chi phí thay pin",
+        "en": "Battery replacement cost"
+      },
+      "value": "12.000.000",
+      "unit": {
+        "vi": "đ",
+        "en": "đ"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "wading-depth",
+      "label": {
+        "vi": "Lội nước tối đa",
+        "en": "Maximum wading depth"
+      },
+      "value": "30",
+      "unit": {
+        "vi": "cm",
+        "en": "cm"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "ip-rating",
+      "label": {
+        "vi": "Chuẩn chống nước",
+        "en": "Water resistance rating"
+      },
+      "value": "IP67",
+      "unit": {
+        "vi": "",
+        "en": ""
+      },
+      "illustrative": true
+    },
+    {
+      "key": "charge-cost",
+      "label": {
+        "vi": "Tiền điện mỗi lần sạc đầy",
+        "en": "Electricity per full charge"
+      },
+      "value": "4.500",
+      "unit": {
+        "vi": "đ",
+        "en": "đ"
+      },
+      "illustrative": true
+    },
+    {
+      "key": "public-stations",
+      "label": {
+        "vi": "Số điểm sạc công cộng",
+        "en": "Public charging points"
+      },
+      "value": "150",
+      "unit": {
+        "vi": "điểm",
+        "en": "points"
+      },
+      "illustrative": true
+    }
   ]
 }

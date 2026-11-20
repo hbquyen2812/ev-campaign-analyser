@@ -23,7 +23,7 @@ export const personaName = (id: string, lang: Lang): string =>
 export function specSheetLines(lang: Lang): string[] {
   const tag = lang === "vi" ? "(số minh họa)" : "(illustrative)";
   return SPEC_SHEET.items.map((item) => {
-    const unit = item.unit ? ` ${item.unit}` : "";
+    const unit = item.unit[lang] ? ` ${item.unit[lang]}` : "";
     const note = item.illustrative ? ` ${tag}` : "";
     return `- ${item.label[lang]}: ${item.value}${unit}${note}`;
   });
@@ -34,7 +34,10 @@ export function specSheetLines(lang: Lang): string[] {
  * being analysed. A number outside these was invented by the model.
  */
 export function allowedNumberSources(postText: string): string[] {
-  const sheet = SPEC_SHEET.items.map((i) => `${i.value} ${i.unit}`.trim());
+  // Both spellings of each unit, so a reply saying "3 years" matches a sheet row
+  // written "3 năm" — the guard compares by unit family, and it needs to see both.
+  const sheet = SPEC_SHEET.items.flatMap((i) =>
+    [`${i.value} ${i.unit.vi}`.trim(), `${i.value} ${i.unit.en}`.trim()]);
   return [...sheet, postText];
 }
 
