@@ -111,6 +111,16 @@ checkpoints/
 *.onnx
 *.pkl
 *.joblib
+# ...except the four artefacts the AI server loads at startup: the two public model
+# aliases plus the topic and rhetorical-role featurisers. 5.7 MB in total,
+# and the deployed image builds from this repo, so an ignored model is a 503 in
+# production. These two exceptions must stay below the patterns above: git honours
+# the last rule that matches, so putting them earlier does nothing.
+!ml/models/
+!ml/models/stage1_multisource.joblib
+!ml/models/stage1_multisource_audience_x90.joblib
+!ml/models/topic_model.joblib
+!ml/models/rhetorical_role.joblib
 
 # Spark and Hadoop runtime output
 spark-warehouse/
