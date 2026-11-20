@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "groundedOn": {
+    "comments": {
+      "table": "lakehouse.silver.interactions",
+      "distinctRows": 3081,
+      "usableComments": 265,
+      "note": "Real reader comments from Reddit and X. 2569 of the 3081 distinct rows carry no text and 231 more are scraper artefacts, which is why only 265 are quotable. sourceId is interaction_id."
+    },
+    "posts": {
+      "corpus": "annotation_marketing/all_posts_raw.jsonl",
+      "viPosts": 1043,
+      "note": "Vietnamese EV posts. Used where no real comment covers the concern — flooded streets and rented-room charging are local worries the English comment set does not reach. sourceId is post_id."
+    }
+  },
+  "personas": [
+    {
+      "id": "tinh-toan",
+      "name": {
+        "vi": "Anh Tính Toán",
+        "en": "The Calculator"
+      },
+      "tagline": {
+        "vi": "Chỉ quan tâm tiền. Hỏi con số, không tin quảng cáo chung chung.",
+        "en": "Only cares about money. Asks for figures, distrusts vague marketing."
+      },
+      "age": "35",
+      "situation": {
+        "vi": "Đang đi xe xăng, cân nhắc đổi sang xe điện. So từng đồng chi phí 5 năm: giá xe, tiền điện, tiền thay pin.",
+        "en": "Rides a petrol bike, considering switching. Compares every dong of 5-year cost: price, electricity, battery replacement."
+      },
+      "concerns": {
+        "vi": "Tiền. Giá lăn bánh, tiền thay pin, tổng chi phí 5 năm so với xe xăng, giá bán lại.",
+        "en": "Money. On-road price, battery replacement, five-year cost versus petrol, resale value."
+      },
+      "voice": {
+        "vi": "Câu ngắn, cộc. Luôn kết bằng một câu hỏi có con số. Không khách sáo. Hay dùng 'tính ra', 'vậy chứ', 'bao nhiêu'.",
+        "en": "Short, blunt sentences. Always ends on a question that demands a number."
+      },
+      "seedQuotes": [
+        {
+          "text": "Saving $600 per month in gas, diesel, DEF, and oil changes and have a truck w 460 miles in range. With updated utility rate that starts tomorrow, will be $750 per month.",
+          "kind": "comment",
+          "sourceId": "dd97a02c3175c569a44bc6e2ef0382d43fdaceea7dac53a849d242f33910b38b",
+          "platform": "reddit"
+        },
+        {
+          "text": "Yes, but when I spend $7650 on a 2010 Honda civic hybrid that's at 80,000 mileage, there's absolutely no problem at all after I've driven it for years.",
+          "kind": "comment",
+          "sourceId": "8445b49f89922e9cabd39d017e41b0c1964bfa7baf4743c10532680b16de9c8f",
+          "platform": "reddit"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Thay pin hết bao nhiêu?",
+          "Tính ra 5 năm có rẻ hơn xăng không?",
+          "Giá lăn bánh bao nhiêu, đã gồm pin chưa?"
+        ],
+        "en": [
+          "How much does a replacement battery cost?",
+          "Over five years, does this actually work out cheaper than petrol?",
+          "What is the on-road price, and does that include the battery?"
+        ]
+      },
+      "trust": {
+        "start": 35,
+        "rewards": [
+          "number",
+          "admits-limit"
+        ],
+        "punishes": [
+          "vague",
+          "hype"
+        ]
+      }
+    },
+    {
+      "id": "lo-ngap",
+      "name": {
+        "vi": "Chị Lo Ngập",
+        "en": "The Flood Worrier"
+      },
+      "tagline": {
+        "vi": "Sợ xe hỏng khi đi mưa lớn, đường ngập. Sợ cháy pin.",
+        "en": "Afraid the bike dies in heavy rain and flooded streets. Afraid of battery fires."
+      },
+      "age": "40",
+      "situation": {
+        "vi": "Ở thành phố hay ngập khi mưa, chở con đi học mỗi ngày. Đọc nhiều tin xe điện chết máy giữa đường và cháy pin.",
+        "en": "Lives in a city that floods, rides her child to school daily. Has read many stories of EVs stalling and batteries catching fire."
+      },
+      "concerns": {
+        "vi": "An toàn. Đi qua đường ngập, chạy dưới mưa lớn, chết máy giữa đường, cháy pin khi sạc.",
+        "en": "Safety. Riding through floods and heavy rain, stalling mid-road, battery fires while charging."
+      },
+      "voice": {
+        "vi": "Lo lắng, hỏi dồn. Hay kể trường hợp nghe được. Cần được trấn an bằng giới hạn cụ thể, không phải lời hứa.",
+        "en": "Anxious, asks in bursts. Cites stories she has heard. Needs concrete limits, not reassurance."
+      },
+      "seedQuotes": [
+        {
+          "text": "Reputation and reliability clearly matter way more than spec sheets to Norwegian buyers.",
+          "kind": "comment",
+          "sourceId": "01c09142887cfb7d237cf296ea5bd5115d3d688d90de4b95a70e378d5d0850e4",
+          "platform": "reddit"
+        },
+        {
+          "text": "If you live in an area that gets lots of rain, and plenty of road salt in the winter, then they will get deep rust if you don't brake hard reguarly.",
+          "kind": "comment",
+          "sourceId": "9c2a6da4f2240e04e9f87e6c4eddf8c2364b9a9c8eecd65ee594f74ba3216787",
+          "platform": "reddit"
+        },
+        {
+          "text": "Xe máy điện mà gặp ngập nước như Clip chạy được không?",
+          "kind": "post",
+          "sourceId": "x_vi_1977258545981661611",
+          "platform": "x"
+        },
+        {
+          "text": "Độ bền kém khi gặp nước — dễ hỏng khi ngập nước hoặc trời mưa nếu không đạt chuẩn chống nước cao.",
+          "kind": "post",
+          "sourceId": "x_vi_1946478169852461207",
+          "platform": "x"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Mùa mưa đường ngập tới nửa bánh xe, xe điện đi qua có hỏng không em?",
+          "Xe này lội nước sâu bao nhiêu thì phải dắt bộ?",
+          "Pin có nguy cơ cháy khi sạc qua đêm không em?"
+        ],
+        "en": [
+          "Rainy season floods the street up to half the wheel. Will the bike survive that?",
+          "How deep can it wade before I have to push it?",
+          "Is there any fire risk charging it overnight?"
+        ]
+      },
+      "trust": {
+        "start": 30,
+        "rewards": [
+          "number",
+          "admits-limit",
+          "empathy"
+        ],
+        "punishes": [
+          "vague",
+          "dismissive"
+        ]
+      }
+    },
+    {
+      "id": "sinh-vien",
+      "name": {
+        "vi": "Bạn Sinh Viên",
+        "en": "The Student"
+      },
+      "tagline": {
+        "vi": "Ở trọ, không biết sạc xe ở đâu. Ngân sách hẹp.",
+        "en": "Rents a room, has nowhere to charge. Tight budget."
+      },
+      "age": "20",
+      "situation": {
+        "vi": "Thuê phòng trọ, chủ trọ không cho sạc pin trong nhà vì sợ cháy. Đi học 10 km mỗi ngày, tiền bố mẹ cho có hạn.",
+        "en": "Rents a room where the landlord bans indoor charging over fire risk. Rides 10 km to class daily on an allowance."
+      },
+      "concerns": {
+        "vi": "Chỗ sạc. Chủ trọ không cho sạc trong phòng, sạc ở đâu, đi được bao xa, tiền có đủ không.",
+        "en": "Where to charge. A landlord who bans indoor charging, public charging points, range, affordability."
+      },
+      "voice": {
+        "vi": "Thân thiện, dùng tiếng lóng nhẹ, hỏi thẳng chuyện thực tế hằng ngày. Xưng 'mình', gọi 'bạn'.",
+        "en": "Friendly, lightly colloquial, asks about day-to-day practicalities."
+      },
+      "seedQuotes": [
+        {
+          "text": "I live in CA in an apartment. True cost of ownership still has the EV cheaper to own, though energy cost per mile can dip into the high 20 MPG equivalent.",
+          "kind": "comment",
+          "sourceId": "902478ea82edb492bf5430cf043b9322fa8120764bb9941b341d94a4746aeb5a",
+          "platform": "reddit"
+        },
+        {
+          "text": "I hope you have a garage or space at your home to install a level 2. This car is not going to be fun to own unless you have that.",
+          "kind": "comment",
+          "sourceId": "b9b1d81e19c31e05e1013a7de234778d83c7396acf6a7d67f1d6f2ca0a93f907",
+          "platform": "reddit"
+        },
+        {
+          "text": "Yeah the charge system in VN not welcome new commer. Charging stations from all providers other than Vinfast are open to all EV, including Vinfast.",
+          "kind": "comment",
+          "sourceId": "00c57c3ba86d386ea2ad22c81af172875bda9f93d8e8e4eace19c7fb0bb79294",
+          "platform": "reddit"
+        },
+        {
+          "text": "Vì an toàn cho PCCC nên tp hcm hiếm chung cư, căn hộ cho thuê, nhà trọ.. cho phép cư dân sạc pin xe điện tại nơi gửi xe!",
+          "kind": "post",
+          "sourceId": "x_vi_1959040525669187972",
+          "platform": "x"
+        }
+      ],
+      "openingQuestions": {
+        "vi": [
+          "Mình ở trọ, chủ không cho sạc trong phòng thì sạc ở đâu bạn?",
+          "Một lần sạc đi được mấy ngày nếu mỗi ngày mình chạy 10 km?",
+          "Có trả góp cho sinh viên không bạn?"
+        ],
+        "en": [
+          "I rent a room and my landlord bans charging indoors. Where am I supposed to charge?",
+          "If I ride 10 km a day, how many days does one charge last?",
+          "Do you do instalments for students?"
+        ]
+      },
+      "trust": {
+        "start": 45,
+        "rewards": [
+          "number",
+          "practical",
+          "empathy"
+        ],
+        "punishes": [
+          "vague",
+          "upsell"
+        ]
+      }
+    }
+  ]
+}

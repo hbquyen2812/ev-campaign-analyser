@@ -61,3 +61,84 @@ export interface SentimentResponse {
   reaction: Reaction;
   note: string;
 }
+
+// ---- Persona simulation (audience preview) ----
+export type Localized = Record<Lang, string>;
+
+export interface PersonaQuote {
+  /** Verbatim excerpt from the EV corpus — this is what grounds the persona. */
+  text: string;
+  /** "comment" = a real reader comment; "post" = the body of a published post. */
+  kind: "comment" | "post";
+  /** interaction_id for comments, post_id for posts, so the source row can be re-read. */
+  sourceId: string;
+  platform: string;
+}
+
+export interface Persona {
+  id: string;
+  name: Localized;
+  tagline: Localized;
+  age: string;
+  situation: Localized;
+  /** What this person worries about, phrased the way it goes into the prompt. */
+  concerns: Localized;
+  voice: Localized;
+  seedQuotes: PersonaQuote[];
+  openingQuestions: Partial<Record<Lang, string[]>>;
+  /** Starting trust and what moves it — consumed by the sales-coach page. */
+  trust: { start: number; rewards: string[]; punishes: string[] };
+}
+
+export type ReactionKind = "positive" | "skeptical" | "negative";
+
+export interface SimulatedComment {
+  personaId: string;
+  personaName: string;
+  comment: string;
+  reaction: ReactionKind;
+  /** 0-1: how likely other viewers pile onto this one. Drives the "worst comment" card. */
+  risk: number;
+  suggestedReply: string;
+  /** Figures the numeric guard blanked out of the reply, if any. */
+  redactedNumbers?: string[];
+}
+
+export interface SimulationResponse {
+  comments: SimulatedComment[];
+  /** Share of each reaction across the generated comments, in percent. */
+  mix: Record<ReactionKind, number>;
+  topRisk: SimulatedComment | null;
+  backend: "llm" | "template";
+  warning?: string;
+}
+
+// ---- Sales coach (practice chat) ----
+/** What a seller's answer did right. Each one earns trust. */
+export type CoachStrength = "number" | "admits-limit" | "specific" | "empathy" | "practical";
+/** What it did wrong. Each one costs trust. */
+export type CoachWeakness = "vague" | "hype" | "dismissive" | "upsell";
+
+export interface CoachTurn {
+  role: "customer" | "seller";
+  text: string;
+}
+
+export interface CoachResponse {
+  /** The persona's next line. */
+  reply: string;
+  /** Trust after this answer, 0-100. */
+  trust: number;
+  /** Change from the previous turn — what the bar animates. */
+  trustDelta: number;
+  strengths: CoachStrength[];
+  weaknesses: CoachWeakness[];
+  /** One short sentence on how the answer landed. */
+  feedback: string;
+  /** A better answer to learn from. */
+  modelAnswer: string;
+  /** Figures the seller quoted that the spec sheet does not support. */
+  unsupportedNumbers?: string[];
+  backend: "llm" | "template";
+  warning?: string;
+}

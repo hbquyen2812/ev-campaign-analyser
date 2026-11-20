@@ -10,6 +10,7 @@ import { Icon } from "./components";
 
 const LINKS = [
   { href: "/analyze", key: "nav.analyze" },
+  { href: "/coach", key: "nav.coach" },
   { href: "/variant-lab", key: "nav.variant" },
   { href: "/history", key: "nav.history" },
   { href: "/insights", key: "nav.insights" },
