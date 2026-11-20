@@ -202,8 +202,18 @@ export async function coachTurn({ personaId, history, trust, lang }: CoachInput)
   // "Gave a figure" is checkable, so we check it rather than trust the judgement.
   // Asked to score "Don't worry, it runs fine", the model handed out empathy and the
   // bar went up — on the exact answer the brief uses as its bad example.
+  //
+  // Credit is for the spec sheet alone, deliberately not for `allowed`. The customer's
+  // own words are in `allowed` so that repeating their figure to correct them is not
+  // punished as invention — but measuring credit against that same list rewarded the
+  // seller for parroting a rumour: "heard a battery is 20 million?" answered with
+  // "yes, about 20 million" scored +12 while the sheet says 12.
   const significant = findUnsupportedNumbers(lastSellerLine, []);
-  const quotedASheetFigure = significant.length > invented.length;
+  const offSheet = findUnsupportedNumbers(
+    lastSellerLine,
+    buildAllowedNumbers(allowedNumberSources("")),
+  );
+  const quotedASheetFigure = significant.length > offSheet.length;
 
   // Evidence beats judgement in both directions: an answer that quotes a figure off
   // the spec sheet is not vague, whatever the marker says. Without this the model kept

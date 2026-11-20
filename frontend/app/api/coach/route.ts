@@ -1,6 +1,7 @@
 import { coachTurn } from "@/lib/coach";
 import { llmConfigured } from "@/lib/llm";
 import { getPersona } from "@/lib/personas";
+import { checkRateLimit } from "@/lib/rate-limit";
 import type { CoachResponse, CoachTurn, Lang } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -15,12 +16,24 @@ function json(body: unknown, status = 200): Response {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
 
-/** Keep the lesson going without a model: the trust bar and the rubric still work. */
-function fallback(personaId: string, trust: number, lang: Lang, warning: string): Response {
+/**
+ * Keep the lesson going without a model: the trust bar and the rubric still work.
+ *
+ * Mid-conversation the customer says nothing at all. Opening again on turn five reads
+ * as the customer forgetting the last four answers, which is worse than a visible
+ * warning and no reply — and the page already skips an empty one.
+ */
+function fallback(
+  personaId: string,
+  trust: number,
+  lang: Lang,
+  warning: string,
+  started: boolean,
+): Response {
   const persona = getPersona(personaId);
-  const questions = persona?.openingQuestions[lang] ?? persona?.openingQuestions.en ?? [];
+  const questions = persona?.openingQuestions[lang] ?? persona?.openingQuestions.vi ?? [];
   const body: CoachResponse = {
-    reply: questions[0] ?? "",
+    reply: started ? "" : (questions[0] ?? ""),
     trust,
     trustDelta: 0,
     strengths: [],
@@ -55,14 +68,28 @@ export async function POST(request: Request): Promise<Response> {
   const rawTrust = typeof body.trust === "number" ? body.trust : persona.trust.start;
   const trust = Math.min(100, Math.max(0, Math.round(rawTrust)));
 
+  // Whether the lesson is under way, which decides if a silent fallback is right.
+  const started = history.some((t) => t.role === "seller");
+  // Charged before the model is touched, so a loop costs nothing.
+  const rate = checkRateLimit(request);
+  if (!rate.ok) {
+    return json({
+      detail: rate.scope === "global"
+        ? "The demo has reached its hourly limit. Please try again shortly."
+        : "Too many requests. Please wait a moment and try again.",
+      retryAfterSeconds: rate.retryAfterSeconds,
+    }, 429);
+  }
+
+
   if (!llmConfigured()) {
-    return fallback(personaId, trust, lang, "No model configured; the customer cannot reply.");
+    return fallback(personaId, trust, lang, "No model configured; the customer cannot reply.", started);
   }
 
   try {
     return json(await coachTurn({ personaId, history, trust, lang }));
   } catch (error) {
     const detail = error instanceof Error ? error.message : "unknown error";
-    return fallback(personaId, trust, lang, `The model is unavailable (${detail}).`);
+    return fallback(personaId, trust, lang, `The model is unavailable (${detail}).`, started);
   }
 }

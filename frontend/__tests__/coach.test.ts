@@ -150,6 +150,41 @@ describe("coachTurn", () => {
     expect(result.modelAnswer).toBe(answer);
   });
 
+  it("does not reward parroting a figure the customer made up", async () => {
+    // The customer's figure is in `allowed` so that correcting them is not punished
+    // as invention. Measuring credit against that same list paid the seller +12 for
+    // agreeing with a rumour the sheet contradicts.
+    mockedComplete.mockResolvedValue(reply({ weaknesses: ["vague"] }) as never);
+    const result = await coachTurn({
+      personaId: "tinh-toan",
+      history: [
+        { role: "customer", text: "I heard a replacement battery is 20.000.000 đ?" },
+        { role: "seller", text: "That's right, around 20.000.000 đ." },
+      ],
+      trust: 35,
+      lang: "en",
+    });
+    expect(result.strengths).not.toContain("number");
+    expect(result.trustDelta).toBeLessThan(0);
+    // Still not called invention: the figure came from the customer, not thin air.
+    expect(result.unsupportedNumbers).toBeUndefined();
+  });
+
+  it("rewards correcting the customer with the sheet's own figure", async () => {
+    mockedComplete.mockResolvedValue(reply() as never);
+    const result = await coachTurn({
+      personaId: "tinh-toan",
+      history: [
+        { role: "customer", text: "I heard a replacement battery is 20.000.000 đ?" },
+        { role: "seller", text: "Not 20.000.000 đ — a replacement is 12.000.000 đ." },
+      ],
+      trust: 35,
+      lang: "en",
+    });
+    expect(result.strengths).toContain("number");
+    expect(result.trustDelta).toBeGreaterThan(0);
+  });
+
   it("falls back to an opening question when the model sends no reply", async () => {
     mockedComplete.mockResolvedValue(reply({ reply: "  " }) as never);
     const result = await coachTurn({
