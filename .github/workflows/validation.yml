@@ -153,6 +153,19 @@ jobs:
         with:
           python-version: "3.12"
 
+      # The pipeline builds MinIO from Go source alongside the Spark, Airflow and
+      # collector images. A stock runner has roughly 14 GB free, and the MinIO build
+      # alone exhausted it: "compile: writing output: no space left on device" after
+      # four minutes. None of the preinstalled toolchains removed here are used by
+      # this job.
+      - name: Free disk space
+        run: |
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune --all --force
+          df -h /
+
       - name: Run deterministic Docker pipeline
         run: bash tests/e2e/run_pipeline_reliability_e2e.sh
 
