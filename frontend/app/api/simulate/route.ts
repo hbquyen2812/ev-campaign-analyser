@@ -1,10 +1,14 @@
 import { simulateAudience } from "@/lib/simulate";
 import { llmConfigured } from "@/lib/llm";
 import { SIMULATION_FIXTURE } from "@/lib/fixtures/simulation";
+import { checkRateLimit } from "@/lib/rate-limit";
 import type { Lang } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Three persona calls in parallel: 4.8s typical, but the platform default of 10s
+// would cut off a slow one.
+export const maxDuration = 60;
 
 const MAX_POST_CHARS = 4_000;
 
@@ -31,6 +35,17 @@ export async function POST(request: Request): Promise<Response> {
   // pasted article still has a usable opening.
   const trimmed = post.slice(0, MAX_POST_CHARS);
   const lang: Lang = body.lang === "vi" ? "vi" : "en";
+  // Charged before the model is touched, so a loop costs nothing.
+  const rate = checkRateLimit(request);
+  if (!rate.ok) {
+    return json({
+      detail: rate.scope === "global"
+        ? "The demo has reached its hourly limit. Please try again shortly."
+        : "Too many requests. Please wait a moment and try again.",
+      retryAfterSeconds: rate.retryAfterSeconds,
+    }, 429);
+  }
+
 
   if (!llmConfigured()) return fallback("No model configured; showing a sample run.");
 

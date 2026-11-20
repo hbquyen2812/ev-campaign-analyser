@@ -4,10 +4,13 @@ import type { Lang, PredictionModel } from "./types";
 
 // Language the model writes in — predicted comments, suggested replies, customer
 // lines and coaching. Fixed rather than following the EN/VI toggle, which switches
-// the interface only. English output is steadier and costs roughly 40% fewer tokens,
-// Vietnamese diacritics being expensive to tokenise. Both prompt languages are kept
-// working, so this is one line to flip.
-export const GENERATION_LANG: Lang = "en";
+// the interface only, so a transcript cannot change tongue halfway.
+//
+// Vietnamese: the audience being modelled is Vietnamese, the judges are, and a
+// flood-worried customer speaking English reads as a translation exercise. It costs
+// roughly 40% more tokens than English, which at well under a cent per run does not
+// matter. The English prompts stay working, so this is one line to flip back.
+export const GENERATION_LANG: Lang = "vi";
 
 // The model classifies a post as "viral-likely" when the score is at/above this.
 //
@@ -55,8 +58,8 @@ export const PLATFORM_RELIABILITY: Record<string, number> = MODELS[0].reliabilit
 // Short explanations shown in tooltips (ℹ️) next to technical terms.
 export const GLOSSARY: Record<string, string> = {
   probability: "Estimated chance the post goes viral, from the model (0-100%).",
-  confidence: "How sure the model is about its call — based on how far the score is from the 0.5 threshold.",
-  threshold: "Decision line: at or above 0.5 the post is labelled viral-likely, below it not-viral.",
+  confidence: `How sure the model is about its call — based on how far the score is from the ${DECISION_THRESHOLD} threshold.`,
+  threshold: `Decision line: at or above ${DECISION_THRESHOLD} the post is labelled viral-likely, below it not-viral.`,
   reliability: "How well the model performs on this platform (ROC-AUC on the test set). Lower = take the result with a pinch of salt.",
   factors: "The features that pushed the score up (green) or down (amber), ranked by impact (SHAP).",
   audience: "Follower / subscriber count of the account posting. Bigger audience usually means more reach.",
