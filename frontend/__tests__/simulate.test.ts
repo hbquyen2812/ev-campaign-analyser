@@ -56,16 +56,17 @@ describe("pickTopRisk", () => {
 });
 
 describe("simulateAudience", () => {
-  it("guards the suggested reply against invented figures", async () => {
+  it("strips every figure from the suggested reply, not just invented ones", async () => {
     mockedComplete.mockResolvedValue(reply([
       { comment: "How long is the warranty?", reaction: "skeptical", risk: 0.5,
-        suggestedReply: "The battery is covered for 8 years." },
+        suggestedReply: "Covered for 3 years, and it wades up to 30 cm." },
     ]) as never);
 
     const result = await simulateAudience({ post: "Our EV goes far.", lang: "en" });
-    // The sheet says 3 years, so 8 is invented and must not reach the screen.
-    expect(result.comments[0].suggestedReply).toBe("The battery is covered for … years.");
-    expect(result.comments[0].redactedNumbers).toEqual(["8 years"]);
+    // Both figures are on the spec sheet, and the sheet is placeholder data — so this
+    // is the line a marketer pastes under a real post carrying numbers nobody checked.
+    expect(result.comments[0].suggestedReply).not.toMatch(/[0-9]/);
+    expect(result.comments[0].redactedNumbers).toEqual(["3 years", "30 cm"]);
   });
 
   it("leaves the commenter's own wrong figure alone", async () => {

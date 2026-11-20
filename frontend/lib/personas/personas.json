@@ -16,7 +16,10 @@
   "personas": [
     {
       "id": "tinh-toan",
-      "name": { "vi": "Anh Tính Toán", "en": "The Calculator" },
+      "name": {
+        "vi": "Anh Tính Toán",
+        "en": "The Calculator"
+      },
       "tagline": {
         "vi": "Chỉ quan tâm tiền. Hỏi con số, không tin quảng cáo chung chung.",
         "en": "Only cares about money. Asks for figures, distrusts vague marketing."
@@ -53,13 +56,31 @@
           "Thay pin hết bao nhiêu?",
           "Tính ra 5 năm có rẻ hơn xăng không?",
           "Giá lăn bánh bao nhiêu, đã gồm pin chưa?"
+        ],
+        "en": [
+          "How much does a replacement battery cost?",
+          "Over five years, does this actually work out cheaper than petrol?",
+          "What is the on-road price, and does that include the battery?"
         ]
       },
-      "trust": { "start": 35, "rewards": ["number", "admits-limit"], "punishes": ["vague", "hype"] }
+      "trust": {
+        "start": 35,
+        "rewards": [
+          "number",
+          "admits-limit"
+        ],
+        "punishes": [
+          "vague",
+          "hype"
+        ]
+      }
     },
     {
       "id": "lo-ngap",
-      "name": { "vi": "Chị Lo Ngập", "en": "The Flood Worrier" },
+      "name": {
+        "vi": "Chị Lo Ngập",
+        "en": "The Flood Worrier"
+      },
       "tagline": {
         "vi": "Sợ xe hỏng khi đi mưa lớn, đường ngập. Sợ cháy pin.",
         "en": "Afraid the bike dies in heavy rain and flooded streets. Afraid of battery fires."
@@ -108,13 +129,32 @@
           "Mùa mưa đường ngập tới nửa bánh xe, xe điện đi qua có hỏng không em?",
           "Xe này lội nước sâu bao nhiêu thì phải dắt bộ?",
           "Pin có nguy cơ cháy khi sạc qua đêm không em?"
+        ],
+        "en": [
+          "Rainy season floods the street up to half the wheel. Will the bike survive that?",
+          "How deep can it wade before I have to push it?",
+          "Is there any fire risk charging it overnight?"
         ]
       },
-      "trust": { "start": 30, "rewards": ["number", "admits-limit", "empathy"], "punishes": ["vague", "dismissive"] }
+      "trust": {
+        "start": 30,
+        "rewards": [
+          "number",
+          "admits-limit",
+          "empathy"
+        ],
+        "punishes": [
+          "vague",
+          "dismissive"
+        ]
+      }
     },
     {
       "id": "sinh-vien",
-      "name": { "vi": "Bạn Sinh Viên", "en": "The Student" },
+      "name": {
+        "vi": "Bạn Sinh Viên",
+        "en": "The Student"
+      },
       "tagline": {
         "vi": "Ở trọ, không biết sạc xe ở đâu. Ngân sách hẹp.",
         "en": "Rents a room, has nowhere to charge. Tight budget."
@@ -163,9 +203,25 @@
           "Mình ở trọ, chủ không cho sạc trong phòng thì sạc ở đâu bạn?",
           "Một lần sạc đi được mấy ngày nếu mỗi ngày mình chạy 10 km?",
           "Có trả góp cho sinh viên không bạn?"
+        ],
+        "en": [
+          "I rent a room and my landlord bans charging indoors. Where am I supposed to charge?",
+          "If I ride 10 km a day, how many days does one charge last?",
+          "Do you do instalments for students?"
         ]
       },
-      "trust": { "start": 45, "rewards": ["number", "practical", "empathy"], "punishes": ["vague", "upsell"] }
+      "trust": {
+        "start": 45,
+        "rewards": [
+          "number",
+          "practical",
+          "empathy"
+        ],
+        "punishes": [
+          "vague",
+          "upsell"
+        ]
+      }
     }
   ]
 }

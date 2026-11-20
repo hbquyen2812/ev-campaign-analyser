@@ -53,7 +53,9 @@ const RULES: Record<Lang, string[]> = {
     "Viết đúng giọng của nhân vật trên, không viết giọng nhân viên marketing.",
     "Mỗi bình luận tối đa 2 câu, như người thật gõ vội dưới bài đăng.",
     "CHỈ dùng con số có trong bảng thông số hoặc trong chính bài đăng. Không có số phù hợp thì viết chữ, tuyệt đối không bịa số.",
-    "suggestedReply là câu người bán nên trả lời: lịch sự, có con số lấy từ bảng thông số, và nói thật về giới hạn nếu có.",
+    "suggestedReply là KHUNG câu trả lời của người bán, KHÔNG chứa chữ số nào. Chỗ cần số thì để ngoặc vuông "
+      + "ghi rõ cần số gì, ví dụ \"Dạ xe lội nước tối đa [mức lội nước, cm] ạ\". Lịch sự và nói thật về giới hạn. "
+      + "Bảng thông số chỉ để biết loại số nào tồn tại, không phải để chép ra.",
     "reaction: \"positive\" nếu khen, \"skeptical\" nếu nghi ngờ hoặc hỏi vặn, \"negative\" nếu chê.",
     "Nếu bài đăng trả lời trúng nỗi lo lớn nhất của nhân vật, hãy để họ khen thật lòng. Đừng ép mọi bình luận đều phải nghi ngờ.",
     "risk: 0 đến 1, ước lượng khả năng người khác vào hùa theo bình luận này.",
@@ -65,7 +67,10 @@ const RULES: Record<Lang, string[]> = {
     "Write in the character's voice, never in a marketer's voice.",
     "At most two sentences per comment, the way a real person types under a post.",
     "ONLY use figures that appear in the spec sheet or in the post itself. If none fits, use words — never invent a number.",
-    "suggestedReply is what the seller should answer: polite, carrying a figure from the spec sheet, and honest about limits.",
+    "suggestedReply is a SKELETON of the seller's answer containing NO digits. Put a square-bracket slot "
+      + "wherever a figure belongs, naming what is needed, e.g. \"It wades up to [max wading depth, cm]\". "
+      + "Be polite and honest about limits. The spec sheet tells you which kinds of figure exist; it is not "
+      + "there to be copied out.",
     "reaction: \"positive\" for praise, \"skeptical\" for doubt or pushback, \"negative\" for criticism.",
     "If the post genuinely answers this character's biggest worry, let them say so. Do not force every comment to be critical.",
     "risk: 0 to 1, how likely other viewers pile onto this comment.",

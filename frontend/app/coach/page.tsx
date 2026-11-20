@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { coachTurn } from "@/lib/api";
 import { PERSONAS } from "@/lib/personas";
+import { GENERATION_LANG } from "@/lib/config";
 import type { CoachResponse, CoachTurn } from "@/lib/types";
 import { useLang } from "../LangContext";
 import { useT } from "@/lib/i18n";
@@ -35,13 +36,13 @@ export default function Coach() {
   // Start over whenever the customer or the language changes: a transcript that
   // switches person or tongue halfway is not one anyone can learn from.
   useEffect(() => {
-    const opener = persona.openingQuestions[lang]?.[0] ?? persona.openingQuestions.vi?.[0] ?? "";
+    const opener = persona.openingQuestions[GENERATION_LANG]?.[0] ?? "";
     setHistory(opener ? [{ role: "customer", text: opener }] : []);
     setTrust(persona.trust.start);
     setCoaching(null);
     setError(null);
     setWarning(null);
-  }, [personaId, lang, persona]);
+  }, [personaId, persona]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -59,7 +60,7 @@ export default function Coach() {
     setCoaching(null);
 
     try {
-      const r: CoachResponse = await coachTurn(personaId, next, trust, lang);
+      const r: CoachResponse = await coachTurn(personaId, next, trust, GENERATION_LANG);
       setTrust(r.trust);
       setWarning(r.warning ?? null);
       if (r.reply) setHistory([...next, { role: "customer", text: r.reply }]);

@@ -125,40 +125,24 @@ describe("coachTurn", () => {
     expect(result.strengths).not.toContain("number");
   });
 
-  it("blanks figures the model worked out for the answer it tells you to copy", async () => {
-    // Seen live: "resale around 24,500,000 d at 70% of the purchase price" — neither
-    // figure is on the sheet, both derived from the 35,000,000 price. This is the text
-    // a salesperson is most likely to paste to a real customer.
+  it("strips every figure from the answer the trainee is shown", async () => {
+    // Seen live: "resale around 24.500.000 d at 70% of the purchase price", worked out
+    // from the price; and "wades up to 30 cm, rated IP67", which passes the spec-sheet
+    // check and is still wrong because that sheet is placeholder data. This is the line
+    // most likely to be repeated to a real customer, so no figure survives it.
     mockedComplete.mockResolvedValue(reply({
-      modelAnswer: "Resale after 5 years is about 24.500.000 d, roughly 70% of the purchase price.",
+      modelAnswer: "It wades up to 30 cm, rated IP67, and resale is about 24.500.000 d.",
     }) as never);
     const result = await coachTurn({
       personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",
     });
-    expect(result.modelAnswer).not.toContain("24.500.000");
-    expect(result.modelAnswer).not.toContain("70%");
-    // Not shown with gaps punched in it either — a trainee cannot copy half a
-    // sentence, so they get the move to make when the sheet has nothing.
-    expect(result.modelAnswer).not.toContain("…");
-    expect(result.modelAnswer).toContain("spec sheet has no figure");
+    expect(result.modelAnswer).not.toMatch(/[0-9]/);
+    expect(result.modelAnswer).toContain("wades up to");
   });
 
-  it("keeps a grounded answer, blanking only the stray figure in it", async () => {
-    // Replacing wholesale threw away a correct "replacement costs 12.000.000 đ"
-    // because the model had tacked one unsupported year onto the end.
-    mockedComplete.mockResolvedValue(reply({
-      modelAnswer: "A replacement is 12.000.000 đ, and the pack lasts about 9 years.",
-    }) as never);
-    const result = await coachTurn({
-      personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",
-    });
-    expect(result.modelAnswer).toContain("12.000.000");
-    expect(result.modelAnswer).not.toContain("9 years");
-    expect(result.modelAnswer).not.toContain("spec sheet has no figure");
-  });
-
-  it("leaves a model answer that only quotes the sheet alone", async () => {
-    const answer = "The battery is covered for 3 years and a replacement is 12.000.000 đ.";
+  it("leaves a slot-style answer untouched", async () => {
+    // What the prompt now asks for: shape to copy, figures for the seller to fill in.
+    const answer = "It wades up to [max wading depth, cm]; deeper than that, please push it.";
     mockedComplete.mockResolvedValue(reply({ modelAnswer: answer }) as never);
     const result = await coachTurn({
       personaId: "tinh-toan", history: [{ role: "seller", text: "hi" }], trust: 50, lang: "en",

@@ -18,7 +18,7 @@ function json(body: unknown, status = 200): Response {
 /** Keep the lesson going without a model: the trust bar and the rubric still work. */
 function fallback(personaId: string, trust: number, lang: Lang, warning: string): Response {
   const persona = getPersona(personaId);
-  const questions = persona?.openingQuestions[lang] ?? [];
+  const questions = persona?.openingQuestions[lang] ?? persona?.openingQuestions.en ?? [];
   const body: CoachResponse = {
     reply: questions[0] ?? "",
     trust,

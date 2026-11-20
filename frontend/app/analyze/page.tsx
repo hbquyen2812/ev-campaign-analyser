@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { predict, getReport, getBarriers, getGreenwashing, getSentiment, simulateAudience } from "@/lib/api";
 import { Prediction, Source, Lang, BarrierResponse, GreenwashResponse, SentimentResponse, SimulationResponse, PredictionModel } from "@/lib/types";
 import { AudiencePanel } from "../AudiencePanel";
-import { MODELS, DEFAULT_MODEL_ID, modelApiId, modelName } from "@/lib/config";
+import { MODELS, DEFAULT_MODEL_ID, GENERATION_LANG, modelApiId, modelName } from "@/lib/config";
 import { addHistory, consumeAnalysisDraft, updateHistory } from "@/lib/history";
 import { useLang } from "../LangContext";
 import { useT } from "@/lib/i18n";
@@ -233,7 +233,7 @@ export default function Analyze() {
     // Kicked off first and never awaited: it talks to its own route rather than the
     // Python service, so the predicted comments still arrive when scoring is down —
     // which is exactly when a user most wants to know what the audience will say.
-    void fetchSimulation(request.text, request.lang);
+    void fetchSimulation(request.text, GENERATION_LANG);
     try {
       // Sequential calls: Tailscale Funnel (free tier) and the CPU can't handle
       // many requests at once — parallel calls return 502. One at a time.

@@ -85,9 +85,13 @@ async function runPersona(
   const { data } = await completeJson<{ comments?: RawComment[] }>(prompt);
 
   // The guard covers the suggested reply only. A commenter repeating a wrong figure
-  // from the post is the very thing the tool is meant to surface, so leave that be;
-  // the seller's answer is what must never carry an invented number.
-  const allowed = buildAllowedNumbers(allowedNumberSources(post));
+  // from the post is the very thing the tool is meant to surface, so leave that be.
+  //
+  // The reply is stripped of every figure, not merely unsupported ones: the spec sheet
+  // backing them is placeholder data, so "it wades up to 30 cm" passes the check and is
+  // still a number no one verified, sitting in the line a marketer is most likely to
+  // paste under their own post. The brief wrote this example with blanks in it too.
+  const allowed = buildAllowedNumbers([]);
 
   return (Array.isArray(data.comments) ? data.comments : [])
     .map((raw): SimulatedComment | null => {

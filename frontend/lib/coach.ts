@@ -79,29 +79,20 @@ const CONTRADICTS: Partial<Record<CoachWeakness, CoachStrength[]>> = {
 };
 
 /**
- * The model answer, or coaching in its place.
+ * Strip every figure from the answer the trainee is shown.
  *
- * Three outcomes, by how much of the answer the sheet actually backs:
- *   nothing removed          -> show it as written;
- *   removed, but a sheet
- *   figure still stands      -> show it with the stray figure blanked;
- *   removed, nothing left    -> the sheet cannot answer this, so teach the move.
+ * Not "every unsupported figure" — every one. The guard elsewhere checks figures
+ * against the spec sheet, but that sheet is a placeholder: the wading depth and the
+ * IP rating in it were made up to have something to test against. A model answer
+ * reading "it wades up to 30 cm, rated IP67" therefore passes the check and is still
+ * wrong, and it is the line a salesperson is most likely to repeat to a customer.
  *
- * The middle case matters: replacing wholesale threw away a correct "replacement
- * costs 12.000.000 đ" because the model had tacked one stray year onto the end.
+ * So this one teaches shape, not content. The prompt asks for bracketed slots, and
+ * anything numeric that slips through becomes a gap the seller fills from their own
+ * real sheet — which is how the brief wrote the example in the first place.
  */
-export function guardedModelAnswer(
-  answer: string,
-  allowed: ReturnType<typeof buildAllowedNumbers>,
-  lang: Lang,
-): string {
-  if (!answer) return "";
-  const { text, redacted } = redactUnsupportedNumbers(answer, allowed);
-  if (redacted.length === 0) return answer;
-
-  const significant = findUnsupportedNumbers(answer, []);
-  const hasSupportedFigure = significant.length > redacted.length;
-  return hasSupportedFigure ? text : NO_FIGURE_GUIDANCE[lang];
+export function guardedModelAnswer(answer: string): string {
+  return answer ? redactUnsupportedNumbers(answer, []).text : "";
 }
 
 /** Drop strengths the verdict's own weaknesses rule out. The weakness is believed. */
@@ -115,19 +106,6 @@ export function resolveContradictions(
 
 const asText = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
 
-// What to show instead of a model answer whose figures had to be blanked.
-//
-// Blanking alone leaves "total cost over … years is 35.000.000 đ + … đ", which reads
-// worse than the invention did and still dodges the question. When the sheet has no
-// answer, the thing worth teaching is how to say so.
-const NO_FIGURE_GUIDANCE: Record<Lang, string> = {
-  vi: "Bảng thông số không có số cho câu hỏi này. Cách trả lời đúng: nói thẳng là chưa có số liệu, "
-    + "nêu con số liên quan mà bảng CÓ, rồi xin thông tin của khách để gửi lại số chính xác. "
-    + "Đừng nhẩm ra một con số — khách sẽ kiểm chứng được.",
-  en: "The spec sheet has no figure for this question. The right move: say so plainly, quote the "
-    + "related figure the sheet does carry, then offer to follow up with an exact number. "
-    + "Never work one out on the spot — the customer can check it later.",
-};
 
 const SHAPE = '{"reply":"...","strengths":["number"],"weaknesses":["vague"],"feedback":"...","modelAnswer":"..."}';
 
@@ -154,10 +132,11 @@ function buildCoachPrompt(persona: Persona, history: CoachTurn[], lang: Lang): s
     "Trấn an suông mà không có con số thì KHÔNG phải empathy và KHÔNG phải specific — đó là vague. Chỉ cho empathy khi người bán gọi đúng tên nỗi lo của khách.",
     `3. weaknesses: chọn trong ${JSON.stringify(WEAKNESSES)} — câu trả lời vừa rồi dở chỗ nào.`,
     "4. feedback: MỘT câu nhận xét ngắn cho người bán, nói thẳng hay ở đâu dở ở đâu.",
-    "5. modelAnswer: câu trả lời mẫu tốt hơn, có con số lấy từ bảng thông số và nói thật về giới hạn.",
-    "Tuyệt đối không bịa số ngoài bảng thông số, và KHÔNG được tính ra số mới từ các số trong bảng "
-      + "(không nhân phần trăm, không cộng trừ, không suy ra giá bán lại hay chi phí nhiều năm). "
-      + "Không có số sẵn cho câu hỏi đó thì nói thẳng là chưa có số liệu.",
+    "5. modelAnswer: KHUNG câu trả lời, KHÔNG được chứa bất kỳ chữ số nào. Mỗi chỗ cần số thì để ngoặc vuông "
+      + "ghi rõ cần số gì, ví dụ: \"Dạ xe lội nước tối đa [mức lội nước, cm] ạ, sâu hơn thì chị nên dắt bộ. "
+      + "Pin bảo hành [số năm bảo hành] ạ.\" Dạy cấu trúc và thái độ trả lời, để người bán tự điền số thật.",
+    "Trong modelAnswer tuyệt đối không viết số, kể cả số lấy từ bảng thông số — bảng đó chỉ để bạn biết "
+      + "loại số nào tồn tại, không phải để chép ra.",
     "Chỉ trả về JSON đúng dạng:",
     SHAPE,
   ];
@@ -180,10 +159,12 @@ function buildCoachPrompt(persona: Persona, history: CoachTurn[], lang: Lang): s
     "Bare reassurance with no figure is NOT empathy and NOT specific — it is vague. Award empathy only when the seller names the worry the customer actually raised.",
     `3. weaknesses: pick from ${JSON.stringify(WEAKNESSES)} — what it got wrong.`,
     "4. feedback: ONE short sentence of coaching for the seller, blunt about what worked and what did not.",
-    "5. modelAnswer: a better answer, carrying a figure from the spec sheet and honest about limits.",
-    "Never invent a figure that is not on the spec sheet, and never WORK OUT a new one from it "
-      + "(no percentages of a price, no sums, no derived resale values or multi-year costs). "
-      + "If no figure on the sheet answers the question, say plainly that you do not have it.",
+    "5. modelAnswer: a SKELETON answer containing NO digits at all. Put a square-bracket slot wherever a "
+      + "figure belongs, naming what is needed, e.g. \"It wades up to [max wading depth, cm], deeper than "
+      + "that please push it. The battery is covered for [warranty, years].\" Teach the structure and the "
+      + "honesty; the seller fills in their own real figures.",
+    "modelAnswer must contain no digits at all, not even ones off the spec sheet — the sheet is there to "
+      + "tell you which kinds of figure exist, not to be copied out.",
     "Return JSON only, in exactly this shape:",
     SHAPE,
   ];
@@ -250,7 +231,7 @@ export async function coachTurn({ personaId, history, trust, lang }: CoachInput)
     // offered "resale around 24,500,000 đ at 70% of the purchase price": both figures
     // worked out from the sheet rather than read off it. If anything had to go, the
     // sentence is not worth showing; teach the move instead.
-    modelAnswer: guardedModelAnswer(asText(data.modelAnswer), allowed, lang),
+    modelAnswer: guardedModelAnswer(asText(data.modelAnswer)),
     ...(invented.length > 0 ? { unsupportedNumbers: invented.map((n) => n.raw) } : {}),
     backend: "llm" as const,
   };

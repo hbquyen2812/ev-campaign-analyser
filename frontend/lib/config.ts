@@ -1,6 +1,13 @@
 // Static domain config surfaced in the UI.
 
-import type { PredictionModel } from "./types";
+import type { Lang, PredictionModel } from "./types";
+
+// Language the model writes in — predicted comments, suggested replies, customer
+// lines and coaching. Fixed rather than following the EN/VI toggle, which switches
+// the interface only. English output is steadier and costs roughly 40% fewer tokens,
+// Vietnamese diacritics being expensive to tokenise. Both prompt languages are kept
+// working, so this is one line to flip.
+export const GENERATION_LANG: Lang = "en";
 
 // The model classifies a post as "viral-likely" when the score is at/above this.
 //
