@@ -11,7 +11,8 @@ import { useT } from "@/lib/i18n";
 import Composer from "./Composer";
 import RoadTrip, { type StationState } from "./RoadTrip";
 import VersionCompare, { NETS, type VersionRow } from "./VersionCompare";
-import VideoLab from "./VideoLab";
+import { SAMPLE_VIDEO, VideoCard, type ClipStyle } from "./Clip";
+import { probeVideo, type VideoReport } from "@/lib/video-probe";
 import { NET_NAMES, NetworkCompare, ScoreGauge, MetaGrid, SummaryBox, FactorBars, ReportPanel, BarrierRadar, GreenwashCard, SentimentCard } from "../components";
 
 interface NetResult { source: Source; audience: number | null; prediction: Prediction; }
@@ -60,7 +61,18 @@ export default function Analyze() {
   const [audRd, setAudRd] = useState("");
   const [stations, setStations] = useState<Record<Net, StationState>>(IDLE_STATIONS);
   // Compare mode (formerly the Variant lab page): several versions, scored on all three networks.
-  const [mode, setMode] = useState<"single" | "compare" | "video">("single");
+  const [mode, setMode] = useState<"single" | "compare">("single");
+  // Optional video attached to the post: measured in the browser as soon as it is attached.
+  const [clipSrc, setClipSrc] = useState<string | null>(null);
+  const [clipName, setClipName] = useState("");
+  const [clipStyle, setClipStyle] = useState<ClipStyle>("post");
+  const [clipReport, setClipReport] = useState<VideoReport | null>(null);
+  const [clipBusy, setClipBusy] = useState(false);
+  const [clipProgress, setClipProgress] = useState(0);
+  const [clipError, setClipError] = useState<string | null>(null);
+  const [clipInResults, setClipInResults] = useState(false);
+  const clipUrl = useRef<string | null>(null);
+  const clipRun = useRef(0);
   const [versions, setVersions] = useState<string[]>(["", ""]);
   const [activeV, setActiveV] = useState(0);
   const [vRows, setVRows] = useState<VersionRow[]>([]);
@@ -119,7 +131,7 @@ export default function Analyze() {
   // /variant-lab now lands here with ?mode=compare.
   useEffect(() => {
     const m = new URLSearchParams(window.location.search).get("mode");
-    if (m === "compare" || m === "video") setMode(m);
+    if (m === "compare") setMode(m);
   }, []);
 
   const parseAud = (raw: string) => (raw.trim() ? Number(raw.replace(/[^0-9.]/g, "")) : null);
@@ -357,10 +369,35 @@ export default function Analyze() {
     setCurText(curText.trim() ? `${curText.trim()} ${txt}` : txt);
   }
 
-  function switchMode(m: "single" | "compare" | "video") {
+  async function attachClip(url: string, label: string) {
+    const run = ++clipRun.current;
+    setClipSrc(url); setClipName(label); setClipReport(null); setClipError(null); setClipProgress(0); setClipBusy(true);
+    try {
+      const r = await probeVideo(url, (x) => { if (run === clipRun.current) setClipProgress(x); });
+      if (run === clipRun.current) setClipReport(r);
+    } catch {
+      if (run === clipRun.current) setClipError(lang === "vi" ? "Không đọc được video này. Thử file .mp4 hoặc .webm khác." : "Couldn't read this video. Try another .mp4 or .webm file.");
+    } finally {
+      if (run === clipRun.current) setClipBusy(false);
+    }
+  }
+  function attachFile(f: File) {
+    if (!f.type.startsWith("video/")) { setClipError(lang === "vi" ? "File này không phải video." : "That file isn't a video."); return; }
+    if (clipUrl.current) URL.revokeObjectURL(clipUrl.current);
+    clipUrl.current = URL.createObjectURL(f);
+    void attachClip(clipUrl.current, f.name);
+  }
+  function removeClip() {
+    clipRun.current++;
+    if (clipUrl.current) { URL.revokeObjectURL(clipUrl.current); clipUrl.current = null; }
+    setClipSrc(null); setClipReport(null); setClipBusy(false); setClipError(null); setClipStyle("post"); setClipInResults(false);
+  }
+
+  function switchMode(m: "single" | "compare") {
     if (m === mode) return;
     if (m === "compare" && mode === "single") { setVersions((a) => [text, a[1] ?? "", ...a.slice(2)]); setActiveV(0); }
     if (m === "single" && mode === "compare") setText(versions[activeV] ?? text);
+    if (m === "compare") setClipInResults(false);
     setMode(m);
   }
 
@@ -380,7 +417,7 @@ export default function Analyze() {
       ? "Đổ xăng mỗi tuần mệt rồi? Mỗi lần sạc đầy xe máy điện chỉ khoảng 4.500 đ tiền điện. Lái thử cuối tuần này."
       : "Tired of filling up every week? A full charge costs about 4,500 VND in electricity. Test ride this weekend.";
     if (mode === "compare") { setVersions([v1, v2, v3]); setActiveV(0); }
-    else { setText(v1); if (mode === "video") setMode("single"); }
+    else { setText(v1); if (!clipSrc) void attachClip(SAMPLE_VIDEO, vi ? "Video mẫu (10 giây)" : "Sample video (10 s)"); }
   }
 
   async function onCompare() {
@@ -438,7 +475,7 @@ export default function Analyze() {
               : "Write the post, set your audience at each stop, then let the car go. It stops at YouTube, X and Reddit and tells you how far the post will travel."}
           </p>
         </div>
-        {mode !== "video" && (
+        {(
           <button type="button" className="sample-btn" onClick={fillSample}>
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 4h10l4 4v12H5zM15 4v4h4M9 13h6M9 17h4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" /></svg>
             {lang === "vi" ? "Dùng chiến dịch mẫu" : "Use a sample campaign"}
@@ -453,16 +490,9 @@ export default function Analyze() {
         <button role="tab" aria-selected={mode === "compare"} className={mode === "compare" ? "on" : ""} onClick={() => switchMode("compare")}>
           {lang === "vi" ? "So sánh phiên bản" : "Compare versions"}
         </button>
-        <button role="tab" aria-selected={mode === "video"} className={mode === "video" ? "on" : ""} onClick={() => switchMode("video")}>
-          {lang === "vi" ? "Video" : "Video"} <span className="mode-tag">{lang === "vi" ? "thử nghiệm" : "beta"}</span>
-        </button>
       </div>
 
-      {mode === "video" && (
-        <VideoLab caption={text} setCaption={setText} account={title} audiences={audMap()} apiModel={modelApiId(model)} />
-      )}
-
-      {mode !== "video" && <Composer
+      {<Composer
         title={title}
         setTitle={setTitle}
         text={curText}
@@ -473,6 +503,13 @@ export default function Analyze() {
           remove: (i) => { setVersions((a) => a.filter((_, j) => j !== i)); setActiveV((a) => Math.max(0, a >= i ? a - 1 : a)); },
           filled: versions.map((v) => !!v.trim()),
         } : undefined}
+        clip={mode === "single" ? {
+          src: clipSrc, style: clipStyle, setStyle: setClipStyle,
+          busy: clipBusy, progress: clipProgress, report: clipReport,
+          attach: attachFile,
+          sample: () => void attachClip(SAMPLE_VIDEO, lang === "vi" ? "Video mẫu (10 giây)" : "Sample video (10 s)"),
+          remove: removeClip,
+        } : undefined}
         addTemplate={addTemplate}
         audiences={{ youtube: audYt, x: audX, reddit: audRd }}
         setAudience={(src, v) => (src === "youtube" ? setAudYt : src === "x" ? setAudX : setAudRd)(v)}
@@ -480,7 +517,7 @@ export default function Analyze() {
         setModel={setModel}
         examples={EXAMPLE_KEYS}
         templates={TEMPLATE_KEYS}
-        onLaunch={() => (mode === "compare" ? void onCompare() : onAnalyze())}
+        onLaunch={() => { if (mode === "compare") void onCompare(); else { setClipInResults(!!clipSrc); onAnalyze(); } }}
         launchDisabled={mode === "compare" ? vLoading || versions.filter((v) => v.trim()).length < 2 : loading || !curText.trim()}
         launchLabel={mode === "compare"
           ? (vLoading ? (lang === "vi" ? "Đang so sánh…" : "Comparing…") : (lang === "vi" ? "So sánh các phiên bản" : "Compare the versions"))
@@ -492,6 +529,8 @@ export default function Analyze() {
           </div>
         )}
       />}
+
+      {mode === "single" && clipError && !clipInResults && <div className="error" style={{ marginTop: "1rem" }}>{clipError}</div>}
 
       {mode === "compare" && (vLoading || vRows.length > 0 || vError) && (
         <VersionCompare rows={vRows} loading={vLoading} count={vCount} error={vError} onLookCloser={lookCloser} />
@@ -514,7 +553,13 @@ export default function Analyze() {
         />
       )}
 
-      {/* Outside the results block on purpose: the predicted comments do not depend
+      {mode === "single" && analyzedText && clipInResults && clipSrc && (
+        <div className="reveal" style={{ marginTop: "1.25rem" }}>
+          <VideoCard report={clipReport} busy={clipBusy} progress={clipProgress} error={clipError} name={clipName} />
+        </div>
+      )}
+
+            {/* Outside the results block on purpose: the predicted comments do not depend
           on the viral score, so they must still show when scoring fails. */}
       {mode === "single" && analyzedText && (loadingSimulation || simulation || simulationError) && (
         <div className="reveal" style={{ marginTop: "1.25rem" }}>

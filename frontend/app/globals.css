@@ -868,8 +868,8 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
 .scene.charging .speed { animation: speed 1.2s ease-out; }
 @keyframes speed { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
 .scene.charging .pupil, .scene.done .pupil { transform: translateX(2px); }
-.scene.charging .cable, .scene.done .cable { stroke-dashoffset: 0; transition: stroke-dashoffset 0.35s ease-out 1.15s; }
-.scene.charging .cable-flow { opacity: 1; animation: flow 0.45s linear infinite; transition: opacity 0.2s 1.4s; }
+.scene.charging .cable, .scene.done .cable { stroke-dashoffset: 0; transition: stroke-dashoffset 0.9s ease-in-out 1.15s; }
+.scene.charging .cable-flow { opacity: 1; animation: flow 0.45s linear infinite; transition: opacity 0.2s 2.05s; }
 @keyframes flow { to { stroke-dashoffset: -12; } }
 .scene.charging .bat-fill { animation: fill-up 0.9s ease-in-out 1.4s infinite; }
 @keyframes fill-up { 0% { transform: scaleX(0.05); } 100% { transform: scaleX(1); } }
@@ -1008,7 +1008,7 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
 .trip-car svg.flip { transform: scaleX(-1); }
 .trip-car.driving .tc-wheel { animation: wheel-spin .5s linear infinite; }
 .trip-car.driving .tc-body { animation: sr-bob .18s ease-in-out infinite alternate; }
-.trip-car.plugged .tc-bat { animation: bat-charge 1s ease-in-out infinite; transform-box: fill-box; transform-origin: left; }
+.trip-car.plugged .tc-bat { animation: bat-charge 1s ease-in-out .9s infinite; transform-box: fill-box; transform-origin: left; }
 .trip-car.parked:not(.driving) .tc-body { animation: car-happy .5s ease-out 2; }
 .trip-car.stalled .tc-body { animation: car-shake .4s ease-in-out 3; }
 .trip-car.stalled .tc-bat { fill: var(--danger); }
@@ -1016,7 +1016,9 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
 @keyframes bat-charge { from { transform: scaleX(.15); } to { transform: scaleX(1); } }
 @keyframes car-happy { 50% { transform: translateY(-7px); } }
 @keyframes car-shake { 25% { transform: translateX(-2px) rotate(-1deg); } 75% { transform: translateX(2px) rotate(1deg); } }
-.tc-cable { position: absolute; right: -6%; top: 34%; width: 16%; height: 30%; border: 3px solid var(--hero-dark); border-left: none; border-bottom: none; border-radius: 0 30px 0 0; }
+.tc-cable { position: absolute; right: -14%; top: -8%; width: 14%; height: 58%; border: 3px solid var(--hero-dark); border-right: none; border-bottom: none; border-radius: 26px 0 0 0; animation: cable-reach .9s ease-in-out both; }
+/* the cable grows from the charger (right) towards the car (left) */
+@keyframes cable-reach { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
 .tc-smoke { position: absolute; left: 6%; top: 20%; }
 .tc-smoke i { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: rgba(90, 100, 115, .45); animation: smoke 1.6s ease-out infinite; }
 .tc-smoke i:nth-child(2) { animation-delay: .5s; }
@@ -1567,3 +1569,31 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
 }
 .fb, .fb-cap, .fb-head { text-align: left; }
 .fb-head > div { display: flex; flex-direction: column; align-items: flex-start; }
+
+/* Video attached to a post (inside the composer phone) */
+.post-body.with-media, .post-body.with-media:focus { min-height: 84px; }
+.post-media { margin: 4px -16px 6px; background: #000; }
+.post-media .clip-video { max-height: 380px; object-fit: contain; }
+.clip-player { position: relative; }
+.phone.phone-tt { padding: 0; overflow: hidden; background: #000; }
+.phone.phone-tt .phone-notch { z-index: 3; }
+.phone-tt .tt { min-height: 540px; border-radius: 24px; }
+.tt-player { position: absolute; inset: 0; }
+.tt-player .clip-video { height: 100%; }
+button.tt-cap { border: none; color: #fff; text-align: left; font: inherit; cursor: text; width: auto; }
+.tt-cap p { -webkit-line-clamp: 3; }
+.clip-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.clip-row .clip-style { margin: 0; }
+.clip-remove { border: none; background: none; color: var(--danger); font: 600 14px/1.2 var(--font-body); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.vcard .section-title .vname { margin-left: 6px; font: 500 13px/1 var(--font-body); color: var(--text-muted); }
+.vcard-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .vcard-grid { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .phone-tt .tt { min-height: 470px; border-radius: 18px; } .post-media { margin: 4px -12px 6px; } }
+.phone-tt .post-head, .phone-tt .post-foot, .phone-tt .ver-tabs { display: none; }
+.phone-tt { display: flex; flex-direction: column; }
+.phone-tt .tt { flex: 1; }
+.post-body.with-media, .post-body.with-media:focus { min-height: 128px; }
+
+.cable-energy { animation: cable-energy .6s linear infinite; }
+@keyframes cable-energy { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .tc-cable, .cable-energy { animation: none; } }

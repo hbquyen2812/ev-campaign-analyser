@@ -134,6 +134,6 @@ export function videoAdvice(r: VideoReport, lang: "vi" | "en") {
   if (r.brightness < 0.25) tips.push(vi ? "Hình khá tối, xem trên điện thoại ngoài trời sẽ khó thấy." : "The picture is quite dark and will be hard to see on a phone outdoors.");
   if (r.orientation === "horizontal" && r.duration <= 60) tips.push(vi ? "Video ngắn nhưng khung ngang. Nếu đăng Shorts hay Reels, nên làm thêm một bản khung dọc." : "Short but horizontal. For Shorts or Reels, make a vertical cut too.");
   if (r.duration > 180) tips.push(vi ? "Video dài hơn 3 phút. Cắt thêm một bản 30–60 giây để dùng cho mạng xã hội." : "Over 3 minutes. Cut a 30–60 second version for social media.");
-  if (!tips.length) tips.push(vi ? "Không thấy vấn đề gì rõ ràng về nhịp và khung hình. Phần còn lại là nội dung: thử chạy lời thoại hay chữ trên video qua chế độ \"Một bài\" để xem phản ứng." : "Nothing obvious to fix in pacing or framing. The rest is content: run the voice-over or on-screen text through \"One post\" to see the reaction.");
+  if (!tips.length) tips.push(vi ? "Không thấy vấn đề gì rõ ràng về nhịp và khung hình. Phần còn lại nằm ở nội dung, xem điểm và bình luận dự đoán của phần chữ ở trên." : "Nothing obvious to fix in pacing or framing. The rest is content; see the score and predicted comments for the words above.");
   return { fits, tips };
 }

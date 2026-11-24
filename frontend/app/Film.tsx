@@ -271,8 +271,11 @@ function Scene({ t, tn, lang, fit, calm, upright, aspect }: { t: number; tn: num
   // On an upright screen the sides are cropped, so the station stops closer.
   const stationX = lerp(1780, upright ? 1020 : 1180, ease(seg(t, 0.84, 0.9)));
   const heroX = lerp(560, stationX - 250, ease(seg(t, 0.885, 0.93)));
-  const plugged = t > 0.932;
-  const battery = plugged ? lerp(0.22, 1, seg(t, 0.932, 0.99)) : lerp(0.9, 0.22, seg(t, 0.05, 0.9));
+  // The cable reaches out from the station's socket to the car as you scroll; charging
+  // only starts once it is connected.
+  const cable = ease(seg(t, 0.93, 0.962));
+  const plugged = cable >= 1;
+  const battery = plugged ? lerp(0.22, 1, seg(t, 0.962, 0.995)) : lerp(0.9, 0.22, seg(t, 0.05, 0.9));
 
   return (
     <svg className="film-svg" viewBox={`${viewX.toFixed(1)} 0 ${viewW.toFixed(1)} 1000`} preserveAspectRatio={`xMidYMid ${fit}`} aria-hidden="true">
@@ -462,8 +465,21 @@ function Scene({ t, tn, lang, fit, calm, upright, aspect }: { t: number; tn: num
         <circle cx="70" cy={GROUND - 90} r="12" fill={plugged ? "#3be08a" : "#0a1626"} />
       </g>
 
-      {plugged && (
-        <path d={`M${heroX + 100} ${866 - 70} C ${heroX + 170} ${866 - 40}, ${stationX} ${GROUND - 40}, ${stationX + 58} ${GROUND - 90}`} stroke="#0f1b2d" strokeWidth="6" fill="none" strokeLinecap="round" />
+      {cable > 0 && (
+        <g>
+          <path
+            d={`M${stationX + 70} ${GROUND - 90} C ${stationX} ${GROUND - 40}, ${heroX + 170} ${866 - 40}, ${heroX + 100} ${866 - 70}`}
+            pathLength={1} strokeDasharray="1" strokeDashoffset={1 - cable}
+            stroke="#0f1b2d" strokeWidth="6" fill="none" strokeLinecap="round"
+          />
+          {plugged && (
+            <path
+              d={`M${stationX + 70} ${GROUND - 90} C ${stationX} ${GROUND - 40}, ${heroX + 170} ${866 - 40}, ${heroX + 100} ${866 - 70}`}
+              stroke="#3be08a" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray="4 12" className="cable-energy"
+            />
+          )}
+          {plugged && <circle cx={heroX + 100} cy={866 - 70} r="7" fill="#3be08a" />}
+        </g>
       )}
 
       {/* scene 2: into the phone */}

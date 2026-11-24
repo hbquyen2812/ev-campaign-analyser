@@ -9,6 +9,8 @@ import { MODELS } from "@/lib/config";
 import { useT } from "@/lib/i18n";
 import type { Source } from "@/lib/types";
 import { InfoTip } from "../components";
+import { ClipStrip, PostMedia, TikTokView, type ClipStyle } from "./Clip";
+import type { VideoReport } from "@/lib/video-probe";
 
 const MIN_EXP = 2; // 100
 const MAX_EXP = 7; // 10M
@@ -45,12 +47,19 @@ interface Props {
   status?: React.ReactNode;
   /** Compare mode: several versions of the post, one tab each, edited in the same phone. */
   versions?: { count: number; active: number; setActive: (i: number) => void; add: () => void; remove: (i: number) => void; filled: boolean[] };
+  /** Optional video attached to the post (single-post mode). */
+  clip?: {
+    src: string | null; style: ClipStyle; setStyle: (s: ClipStyle) => void;
+    busy: boolean; progress: number; report: VideoReport | null;
+    attach: (f: File) => void; sample: () => void; remove: () => void;
+  };
 }
 
 export default function Composer(p: Props) {
   const { t, lang } = useT();
   const phoneRef = useRef<HTMLDivElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
+  const clipFile = useRef<HTMLInputElement>(null);
 
   // A ghost of the chip flies into the phone, then the text lands. Pure decoration:
   // the text is added either way, and reduced motion skips the flight.
@@ -90,7 +99,7 @@ export default function Composer(p: Props) {
         {/* ---- the phone: the post as it will appear ---- */}
         <div className="phone-col desk">
           <div className="step-label"><b>1</b>{lang === "vi" ? "Viết bài" : "Write the post"}</div>
-          <div className="phone" ref={phoneRef}>
+          <div className={`phone${p.clip?.src && p.clip.style === "tiktok" ? " phone-tt" : ""}`} ref={phoneRef}>
             <div className="phone-notch" aria-hidden="true" />
             <div className="post-head">
               <span className="post-avatar" aria-hidden="true">
@@ -124,14 +133,19 @@ export default function Composer(p: Props) {
                 )}
               </div>
             )}
-            <textarea
-              ref={taRef}
-              className="post-body"
-              value={p.text}
-              onChange={(e) => p.setText(e.target.value)}
-              placeholder={t("an.post.ph")}
-              aria-label={t("an.post")}
-            />
+            {p.clip?.src && p.clip.style === "tiktok" ? (
+              <TikTokView src={p.clip.src} caption={p.text} account={p.title} onEdit={() => p.clip!.setStyle("post")} />
+            ) : (
+              <textarea
+                ref={taRef}
+                className={`post-body${p.clip?.src ? " with-media" : ""}`}
+                value={p.text}
+                onChange={(e) => p.setText(e.target.value)}
+                placeholder={t("an.post.ph")}
+                aria-label={t("an.post")}
+              />
+            )}
+            {p.clip?.src && p.clip.style === "post" && <PostMedia src={p.clip.src} />}
             <div className="post-foot" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" /></svg>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><path d="M4 5h16v11H9l-5 4V5Z" /></svg>
@@ -146,6 +160,29 @@ export default function Composer(p: Props) {
               <button key={ex.label} className="example-chip" onClick={() => p.setText(t(ex.text))}>{t(ex.label)}</button>
             ))}
           </div>
+          {p.clip && (
+            <div className="clip-row">
+              <span className="chip-lbl">{lang === "vi" ? "Video:" : "Video:"}</span>
+              {!p.clip.src ? (
+                <>
+                  <button type="button" className="example-chip" onClick={() => clipFile.current?.click()}>
+                    {lang === "vi" ? "+ Gắn video" : "+ Attach a video"}
+                  </button>
+                  <button type="button" className="tmpl-chip" onClick={p.clip.sample}>{lang === "vi" ? "Dùng video mẫu" : "Use the sample video"}</button>
+                </>
+              ) : (
+                <>
+                  <span className="clip-style" role="tablist" aria-label={lang === "vi" ? "Xem như" : "Show as"}>
+                    <button role="tab" aria-selected={p.clip.style === "post"} className={p.clip.style === "post" ? "on" : ""} onClick={() => p.clip!.setStyle("post")}>{lang === "vi" ? "Bài đăng" : "Post"}</button>
+                    <button role="tab" aria-selected={p.clip.style === "tiktok"} className={p.clip.style === "tiktok" ? "on" : ""} onClick={() => p.clip!.setStyle("tiktok")}>TikTok / Reels</button>
+                  </span>
+                  <button type="button" className="clip-remove" onClick={p.clip.remove}>{lang === "vi" ? "Bỏ video" : "Remove video"}</button>
+                </>
+              )}
+              <input ref={clipFile} type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) p.clip!.attach(f); e.target.value = ""; }} />
+            </div>
+          )}
+          {p.clip && <ClipStrip report={p.clip.report} busy={p.clip.busy} progress={p.clip.progress} />}
           <div className="chip-row">
             <span className="chip-lbl">{t("an.addtmpl")}</span>
             {p.templates.map((tm) => (
