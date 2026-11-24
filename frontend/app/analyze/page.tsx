@@ -458,7 +458,9 @@ export default function Analyze() {
         </button>
       </div>
 
-      {mode === "video" && <VideoLab />}
+      {mode === "video" && (
+        <VideoLab caption={text} setCaption={setText} account={title} audiences={audMap()} apiModel={modelApiId(model)} />
+      )}
 
       {mode !== "video" && <Composer
         title={title}

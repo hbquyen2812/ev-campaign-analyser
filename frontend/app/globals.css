@@ -1509,3 +1509,61 @@ textarea:focus-visible, input:focus-visible, select:focus-visible { outline: non
   .brand-name { min-width: 0; display: block; }
   .lang-toggle { flex: none; }
 }
+
+/* ================= Video tab: the clip as a TikTok/Reels or Facebook post ================= */
+.clip-style { display: inline-flex; gap: 4px; padding: 3px; margin: 0 0 12px; border-radius: 10px; background: rgba(255,255,255,.7); border: 1px solid #d6e2f2; }
+.clip-style button { border: none; background: none; padding: 6px 12px; border-radius: 8px; font: 600 13.5px/1.2 var(--font-body); color: var(--text-secondary); cursor: pointer; }
+.clip-style button.on { background: var(--sign); color: #fff; }
+.vphone.clip-tiktok { padding: 0; overflow: hidden; background: #000; }
+.vphone.clip-tiktok .phone-notch { z-index: 3; }
+.tt { position: relative; flex: 1; min-height: 520px; display: flex; background: #000; border-radius: 24px; overflow: hidden; color: #fff; }
+.clip-video { width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer; background: #000; }
+.tt .clip-video { position: absolute; inset: 0; }
+.tt-top { position: absolute; top: 30px; left: 0; right: 0; display: flex; justify-content: center; gap: 16px; font-size: 14px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,.6); color: rgba(255,255,255,.75); pointer-events: none; }
+.tt-top b { color: #fff; border-bottom: 2px solid #fff; padding-bottom: 2px; }
+.clip-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; border: none; background: rgba(0,0,0,.45); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.tt-rail { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 18px; filter: drop-shadow(0 1px 3px rgba(0,0,0,.6)); }
+.tt-avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--sign); color: var(--yellow); border: 2px solid #fff; }
+.tt-mute { border: none; background: rgba(0,0,0,.35); color: #fff; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.tt-cap { position: absolute; left: 0; right: 64px; bottom: 0; padding: 60px 14px 18px; background: linear-gradient(transparent, rgba(0,0,0,.7)); text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.tt-cap strong { display: block; font-size: 15px; margin-bottom: 4px; }
+.tt-cap p { margin: 0; font-size: 14px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+.tt-cap p.open { -webkit-line-clamp: unset; display: block; }
+.tt-sound { display: block; margin-top: 8px; font-size: 12.5px; opacity: .9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clip-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255,255,255,.3); }
+.clip-bar i { display: block; height: 100%; background: #fff; }
+
+.vphone.clip-facebook { padding: 30px 0 10px; background: #fff; }
+.fb { display: flex; flex-direction: column; color: var(--text); }
+.fb-head { display: flex; align-items: center; gap: 10px; padding: 4px 14px 8px; }
+.fb-head .tt-avatar { width: 36px; height: 36px; border-width: 0; }
+.fb-head strong { display: block; font-size: 15px; }
+.fb-head span { font-size: 12.5px; color: var(--text-muted); }
+.fb-cap { margin: 0 0 10px; padding: 0 14px; font-size: 15px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+.fb-cap.open { -webkit-line-clamp: unset; display: block; }
+.fb-media { position: relative; background: #000; }
+.fb-media .clip-video { height: auto; max-height: 440px; object-fit: contain; }
+.fb-actions { display: flex; justify-content: space-around; padding: 10px 8px 0; margin-top: 6px; border-top: 1px solid var(--surface-soft); font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+.fb-actions span { display: inline-flex; align-items: center; gap: 6px; }
+
+.vstrip-now { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 6px rgba(255,255,255,.8); }
+.clip-caption { display: block; margin: 14px 0 0; }
+.clip-caption span { display: block; margin-bottom: 6px; font: 700 15px/1.2 var(--font-head); color: var(--text); }
+.clip-caption textarea { min-height: 84px; font-size: 15px; resize: vertical; }
+.vsub.first { margin-top: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.vsub.first .vname { margin: 0; font: 500 13px/1 var(--font-body); }
+.launch.small { margin-top: 0; padding: 11px; font-size: 16px; }
+.vhint { margin: 6px 0 0; font-size: 13.5px; color: var(--text-muted); }
+.vscores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.vscore { padding: 10px 12px; border-radius: 12px; background: var(--screen); color: #a9bad0; font-size: 12.5px; font-weight: 600; animation: reveal-up .4s ease-out backwards; }
+.vscore:nth-child(2) { animation-delay: .08s; } .vscore:nth-child(3) { animation-delay: .16s; }
+.vscore strong { display: block; margin: 4px 0 6px; font: 800 28px/1 var(--font-head); color: var(--led); }
+.vscore strong.low { color: var(--led-amber); }
+.vscore strong small { font-size: .5em; margin-left: 2px; }
+.vscore .charge { height: 8px; gap: 2px; }
+@media (max-width: 560px) {
+  .tt { min-height: 460px; border-radius: 18px; }
+  .vphone.clip-tiktok { padding: 0; }
+}
+.fb, .fb-cap, .fb-head { text-align: left; }
+.fb-head > div { display: flex; flex-direction: column; align-items: flex-start; }
