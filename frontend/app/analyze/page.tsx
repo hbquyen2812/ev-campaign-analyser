@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { predict, getReport, getBarriers, getGreenwashing, getSentiment, simulateAudience } from "@/lib/api";
-import { Prediction, Source, Lang, BarrierResponse, GreenwashResponse, SentimentResponse, SimulationResponse, PredictionModel } from "@/lib/types";
+import { predict, predictBatch, getReport, getBarriers, getGreenwashing, getSentiment, simulateAudience } from "@/lib/api";
+import { Prediction, ReportJobStatus, Source, Lang, BarrierResponse, GreenwashResponse, SentimentResponse, SimulationResponse, PredictionModel } from "@/lib/types";
 import { AudiencePanel } from "../AudiencePanel";
 import { MODELS, DEFAULT_MODEL_ID, GENERATION_LANG, modelApiId, modelName } from "@/lib/config";
 import { addHistory, consumeAnalysisDraft, updateHistory } from "@/lib/history";
 import { useLang } from "../LangContext";
 import { useT } from "@/lib/i18n";
-import { InfoTip, NET_NAMES, NetworkCompare, ScoreGauge, MetaGrid, SummaryBox, FactorBars, ReportPanel, BarrierRadar, GreenwashCard, SentimentCard } from "../components";
+import Composer from "./Composer";
+import RoadTrip, { type StationState } from "./RoadTrip";
+import VersionCompare, { NETS, type VersionRow } from "./VersionCompare";
+import VideoLab from "./VideoLab";
+import { NET_NAMES, NetworkCompare, ScoreGauge, MetaGrid, SummaryBox, FactorBars, ReportPanel, BarrierRadar, GreenwashCard, SentimentCard } from "../components";
 
 interface NetResult { source: Source; audience: number | null; prediction: Prediction; }
 interface AnalysisRequest {
@@ -22,6 +26,8 @@ interface AnalysisRequest {
 }
 interface QueueToast { id: number; title: string; message: string; }
 const NETWORKS: Source[] = ["youtube", "x", "reddit"];
+type Net = "youtube" | "x" | "reddit";
+const IDLE_STATIONS: Record<Net, StationState> = { youtube: { status: "waiting" }, x: { status: "waiting" }, reddit: { status: "waiting" } };
 
 // The barrier, greenwashing and sentiment cards call /barriers, /greenwashing and
 // /sentiment, which the Python service has never implemented — a known gap recorded
@@ -52,7 +58,16 @@ export default function Analyze() {
   const [audYt, setAudYt] = useState("");
   const [audX, setAudX] = useState("");
   const [audRd, setAudRd] = useState("");
-  const taRef = useRef<HTMLTextAreaElement>(null);
+  const [stations, setStations] = useState<Record<Net, StationState>>(IDLE_STATIONS);
+  // Compare mode (formerly the Variant lab page): several versions, scored on all three networks.
+  const [mode, setMode] = useState<"single" | "compare" | "video">("single");
+  const [versions, setVersions] = useState<string[]>(["", ""]);
+  const [activeV, setActiveV] = useState(0);
+  const [vRows, setVRows] = useState<VersionRow[]>([]);
+  const [vLoading, setVLoading] = useState(false);
+  const [vCount, setVCount] = useState(0);
+  const [vError, setVError] = useState<string | null>(null);
+  const [reportJob, setReportJob] = useState<{ status: ReportJobStatus | null; position: number | null }>({ status: null, position: null });
 
   const [analyzedText, setAnalyzedText] = useState<string | null>(null);
   const [analyzedModel, setAnalyzedModel] = useState(DEFAULT_MODEL_ID);
@@ -101,10 +116,11 @@ export default function Analyze() {
 
   useEffect(() => () => toastTimersRef.current.forEach(clearTimeout), []);
 
+  // /variant-lab now lands here with ?mode=compare.
   useEffect(() => {
-    const el = taRef.current;
-    if (el) { el.style.height = "auto"; el.style.height = `${Math.max(el.scrollHeight, 280)}px`; }
-  }, [text]);
+    const m = new URLSearchParams(window.location.search).get("mode");
+    if (m === "compare" || m === "video") setMode(m);
+  }, []);
 
   const parseAud = (raw: string) => (raw.trim() ? Number(raw.replace(/[^0-9.]/g, "")) : null);
   const audMap = (): Record<Source, number | null> => ({ youtube: parseAud(audYt), x: parseAud(audX), reddit: parseAud(audRd), "": null });
@@ -128,9 +144,11 @@ export default function Analyze() {
     setLoadingReport(true);
     setReportProgress(t("rep.submitting"));
     setReportError(null);
+    setReportJob({ status: null, position: null });
     const toastId = showQueueToast(t("queue.report.title"), t("queue.report.submitting"));
     try {
       const res = await getReport(txt, s, audience, l, apiModel, (job) => {
+        setReportJob({ status: job.status, position: job.position });
         setReportProgress(job.status === "queued" ? t("rep.queued", job.position ?? 1) : t("rep.running"));
         updateQueueToast(
           toastId,
@@ -229,6 +247,7 @@ export default function Analyze() {
     setSentimentError(null);
     setSimulation(null);
     setSimulationError(null);
+    setStations(IDLE_STATIONS);
     setLoading(true);
     // Kicked off first and never awaited: it talks to its own route rather than the
     // Python service, so the predicted comments still arrive when scoring is down —
@@ -238,7 +257,24 @@ export default function Analyze() {
       // Sequential calls: Tailscale Funnel (free tier) and the CPU can't handle
       // many requests at once — parallel calls return 502. One at a time.
       const preds: Prediction[] = [];
-      for (const s of NETWORKS) preds.push(await predict(request.text, s, request.audiences[s], request.apiModel));
+      // Each station lights up as its own request starts and lands, so the car on
+      // screen is the real progress, not a timer.
+      for (const s of NETWORKS) {
+        const net = s as Net;
+        setStations((st) => ({ ...st, [net]: { status: "charging" } }));
+        try {
+          const pr = await predict(request.text, s, request.audiences[s], request.apiModel);
+          preds.push(pr);
+          setStations((st) => ({ ...st, [net]: { status: "done", score: pr.viral_score } }));
+        } catch (err) {
+          setStations((st) => {
+            const next = { ...st, [net]: { status: "down" as const } };
+            for (const r of NETWORKS) if (next[r as Net].status === "waiting") next[r as Net] = { status: "skipped" };
+            return next;
+          });
+          throw err;
+        }
+      }
       const res: NetResult[] = NETWORKS.map((s, i) => ({ source: s, audience: request.audiences[s], prediction: preds[i] }));
       setResults(res);
       const best = res.reduce((a, b) => (b.prediction.viral_score > a.prediction.viral_score ? b : a));
@@ -280,7 +316,8 @@ export default function Analyze() {
     }
   }
 
-  function onAnalyze() {
+  function onAnalyze(override?: string) {
+    const text = override ?? curText;
     const historyId = (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
     const audiences = audMap();
     const willQueue = aiPipelineBusyRef.current;
@@ -311,8 +348,66 @@ export default function Analyze() {
     void runAnalysis(request);
   }
 
+  const curText = mode === "single" ? text : versions[activeV] ?? "";
+  function setCurText(v: string) {
+    if (mode === "single") setText(v);
+    else setVersions((a) => a.map((x, i) => (i === activeV ? v : x)));
+  }
   function addTemplate(txt: string) {
-    setText((prev) => (prev.trim() ? `${prev.trim()} ${txt}` : txt));
+    setCurText(curText.trim() ? `${curText.trim()} ${txt}` : txt);
+  }
+
+  function switchMode(m: "single" | "compare" | "video") {
+    if (m === mode) return;
+    if (m === "compare" && mode === "single") { setVersions((a) => [text, a[1] ?? "", ...a.slice(2)]); setActiveV(0); }
+    if (m === "single" && mode === "compare") setText(versions[activeV] ?? text);
+    setMode(m);
+  }
+
+  // A ready-made campaign, so a first visit can try everything without writing anything.
+  // Figures come from the illustrative spec sheet, so the number check passes.
+  function fillSample() {
+    const vi = lang === "vi";
+    setTitle(vi ? "Xe máy điện mùa mưa, tháng 12" : "Electric scooter for the rainy season, December");
+    setAudYt("120000"); setAudX("8000"); setAudRd("15000");
+    const v1 = vi
+      ? "Mùa mưa ngập vẫn đi làm bình thường. Xe máy điện chuẩn chống nước IP67, lội nước tối đa 30 cm, đi được 120 km mỗi lần sạc, mỗi lần sạc đầy chỉ tốn khoảng 4.500 đ tiền điện. Đặt lịch lái thử miễn phí cuối tuần này!"
+      : "Rainy season, flooded streets, still on time for work. IP67 water resistance, wades up to 30 cm, 120 km per charge, and a full charge costs about 4,500 VND in electricity. Book a free test ride this weekend!";
+    const v2 = vi
+      ? "Sợ xe chết máy giữa đường ngập? Xe máy điện này đạt chuẩn IP67 và lội được nước sâu tới 30 cm. Ghé showroom chạy thử trên đường ngập mô phỏng."
+      : "Worried about stalling in a flooded street? This scooter is IP67 rated and wades up to 30 cm. Come try it on our flooded test track.";
+    const v3 = vi
+      ? "Đổ xăng mỗi tuần mệt rồi? Mỗi lần sạc đầy xe máy điện chỉ khoảng 4.500 đ tiền điện. Lái thử cuối tuần này."
+      : "Tired of filling up every week? A full charge costs about 4,500 VND in electricity. Test ride this weekend.";
+    if (mode === "compare") { setVersions([v1, v2, v3]); setActiveV(0); }
+    else { setText(v1); if (mode === "video") setMode("single"); }
+  }
+
+  async function onCompare() {
+    const filled = versions.map((v, i) => ({ text: v.trim(), index: i })).filter((v) => v.text);
+    if (filled.length < 2) { setVError(lang === "vi" ? "Viết ít nhất hai bản có nội dung để so sánh." : "Write at least two versions to compare."); setVRows([]); return; }
+    const aud = audMap();
+    const apiModel = modelApiId(model);
+    const items = filled.flatMap((v) => NETS.map((n) => ({ text: v.text, source: n.key as Source, audience: aud[n.key], model: apiModel })));
+    setVError(null); setVRows([]); setVCount(filled.length); setVLoading(true);
+    try {
+      const preds = await predictBatch(items);
+      setVRows(filled.map((v, i) => ({
+        index: v.index, text: v.text,
+        scores: { youtube: preds[i * 3], x: preds[i * 3 + 1], reddit: preds[i * 3 + 2] },
+      })));
+    } catch (e) {
+      setVError(e instanceof Error ? e.message : t("an.err"));
+    } finally {
+      setVLoading(false);
+    }
+  }
+
+  function lookCloser(v: string) {
+    setText(v);
+    setMode("single");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onAnalyze(v);
   }
 
   function selectNetwork(s: Source) {
@@ -334,80 +429,99 @@ export default function Analyze() {
           </div>
         ))}
       </div>
-      <h1 className="page-title">{t("an.title")}</h1>
-      <p className="input-cue">{t("an.cue.a")}<strong>{t("an.cue.strong")}</strong></p>
+      <header className="an-head">
+        <div>
+          <h1 className="page-title">{t("an.title")}</h1>
+          <p className="an-cue">
+            {lang === "vi"
+              ? "Viết bài, đặt số người theo dõi ở từng trạm rồi cho xe chạy. Xe sẽ ghé YouTube, X và Reddit và cho bạn biết bài đi xa tới đâu."
+              : "Write the post, set your audience at each stop, then let the car go. It stops at YouTube, X and Reddit and tells you how far the post will travel."}
+          </p>
+        </div>
+        {mode !== "video" && (
+          <button type="button" className="sample-btn" onClick={fillSample}>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 4h10l4 4v12H5zM15 4v4h4M9 13h6M9 17h4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" /></svg>
+            {lang === "vi" ? "Dùng chiến dịch mẫu" : "Use a sample campaign"}
+          </button>
+        )}
+      </header>
 
-      <div className="card">
-        <div style={{ marginBottom: 18 }}>
-          <label htmlFor="title">{t("an.campaign")}</label>
-          <input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("an.campaign.ph")} />
-          <div className="help">{t("an.campaign.help")}</div>
-        </div>
-        <div className="input-grid">
-          <div>
-            <label htmlFor="post">{t("an.post")}</label>
-            <textarea ref={taRef} id="post" value={text} onChange={(e) => setText(e.target.value)}
-              placeholder={t("an.post.ph")} />
-            <div className="examples">
-              {t("an.try")}
-              {EXAMPLE_KEYS.map((ex) => (
-                <button key={ex.label} className="example-chip" onClick={() => setText(t(ex.text))}>{t(ex.label)}</button>
-              ))}
-            </div>
-            <div className="templates">
-              {t("an.addtmpl")}
-              {TEMPLATE_KEYS.map((tm) => (
-                <button key={tm.role} className="tmpl-chip" onClick={() => addTemplate(t(tm.text))} title={t(tm.text)}>+ {t(tm.role)}</button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="aud-label">{t("an.aud")} <InfoTip term="audience" /> <span className="muted">{t("an.optional")}</span></div>
-            <div className="aud-stack">
-              <div><label>{t("an.aud.yt")}</label><input value={audYt} onChange={(e) => setAudYt(e.target.value.replace(/\D/g, ""))} placeholder="e.g. 50000" inputMode="numeric" pattern="[0-9]*" /></div>
-              <div><label>{t("an.aud.x")}</label><input value={audX} onChange={(e) => setAudX(e.target.value.replace(/\D/g, ""))} placeholder="e.g. 12000" inputMode="numeric" pattern="[0-9]*" /></div>
-              <div><label>{t("an.aud.rd")}</label><input value={audRd} onChange={(e) => setAudRd(e.target.value.replace(/\D/g, ""))} placeholder="e.g. 340000" inputMode="numeric" pattern="[0-9]*" /></div>
-            </div>
-            <div style={{ marginTop: 16 }}>
-              <label htmlFor="model">{t("an.model")}</label>
-              <select id="model" value={model} onChange={(e) => setModel(e.target.value)}>
-                {MODELS.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
-              <div className="help">{t(`model.${model}.blurb`)}</div>
-            </div>
-            <button className="btn btn-block" onClick={onAnalyze} disabled={loading || !text.trim()}>
-              {loading ? t("an.analyzing") : loadingAiPipeline ? t("an.queue.add") : t("an.analyze")}
-            </button>
-            {loadingAiPipeline && (
-              <div className="analysis-queue-status" role="status">
-                <span className="spinner" />
-                {queuedAnalyses > 0 ? t("an.queue.pending", queuedAnalyses) : t("an.queue.running")}
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="mode-switch" role="tablist" aria-label={lang === "vi" ? "Chế độ" : "Mode"}>
+        <button role="tab" aria-selected={mode === "single"} className={mode === "single" ? "on" : ""} onClick={() => switchMode("single")}>
+          {lang === "vi" ? "Một bài" : "One post"}
+        </button>
+        <button role="tab" aria-selected={mode === "compare"} className={mode === "compare" ? "on" : ""} onClick={() => switchMode("compare")}>
+          {lang === "vi" ? "So sánh phiên bản" : "Compare versions"}
+        </button>
+        <button role="tab" aria-selected={mode === "video"} className={mode === "video" ? "on" : ""} onClick={() => switchMode("video")}>
+          {lang === "vi" ? "Video" : "Video"} <span className="mode-tag">{lang === "vi" ? "thử nghiệm" : "beta"}</span>
+        </button>
       </div>
 
-      {error && <div className="error" style={{ marginTop: "1.25rem" }}>{error}</div>}
+      {mode === "video" && <VideoLab />}
 
-      {analyzedText && !error && (
-        <div className="preview" style={{ marginTop: "1.25rem" }}>
-          <div className="lbl">{t("an.preview.lbl")}</div>
-          <div className="txt">{analyzedText}</div>
-          <div className="tags">{t("an.preview.tags", modelName(analyzedModel), lang.toUpperCase())}</div>
-        </div>
+      {mode !== "video" && <Composer
+        title={title}
+        setTitle={setTitle}
+        text={curText}
+        setText={setCurText}
+        versions={mode === "compare" ? {
+          count: versions.length, active: activeV, setActive: setActiveV,
+          add: () => { if (versions.length < 5) { setVersions((a) => [...a, ""]); setActiveV(versions.length); } },
+          remove: (i) => { setVersions((a) => a.filter((_, j) => j !== i)); setActiveV((a) => Math.max(0, a >= i ? a - 1 : a)); },
+          filled: versions.map((v) => !!v.trim()),
+        } : undefined}
+        addTemplate={addTemplate}
+        audiences={{ youtube: audYt, x: audX, reddit: audRd }}
+        setAudience={(src, v) => (src === "youtube" ? setAudYt : src === "x" ? setAudX : setAudRd)(v)}
+        model={model}
+        setModel={setModel}
+        examples={EXAMPLE_KEYS}
+        templates={TEMPLATE_KEYS}
+        onLaunch={() => (mode === "compare" ? void onCompare() : onAnalyze())}
+        launchDisabled={mode === "compare" ? vLoading || versions.filter((v) => v.trim()).length < 2 : loading || !curText.trim()}
+        launchLabel={mode === "compare"
+          ? (vLoading ? (lang === "vi" ? "Đang so sánh…" : "Comparing…") : (lang === "vi" ? "So sánh các phiên bản" : "Compare the versions"))
+          : loading ? t("an.analyzing") : loadingAiPipeline ? t("an.queue.add") : t("an.stage.go")}
+        status={loadingAiPipeline && (
+          <div className="analysis-queue-status" role="status">
+            <span className="spinner" />
+            {queuedAnalyses > 0 ? t("an.queue.pending", queuedAnalyses) : t("an.queue.running")}
+          </div>
+        )}
+      />}
+
+      {mode === "compare" && (vLoading || vRows.length > 0 || vError) && (
+        <VersionCompare rows={vRows} loading={vLoading} count={vCount} error={vError} onLookCloser={lookCloser} />
+      )}
+
+      {mode === "single" && error && <div className="error" style={{ marginTop: "1.25rem" }}>{error}</div>}
+
+      {mode === "single" && analyzedText && (
+        <RoadTrip
+          stations={stations}
+          best={results.length ? results.reduce((a, b) => (b.prediction.viral_score > a.prediction.viral_score ? b : a)).source : null}
+          selected={selected}
+          onSelect={selectNetwork}
+          canSelect={!loadingAiPipeline}
+          postText={analyzedText}
+          tags={t("an.preview.tags", modelName(analyzedModel), lang.toUpperCase())}
+          simulation={simulation}
+          simLoading={loadingSimulation}
+          report={{ loading: loadingReport, status: reportJob.status, position: reportJob.position }}
+        />
       )}
 
       {/* Outside the results block on purpose: the predicted comments do not depend
           on the viral score, so they must still show when scoring fails. */}
-      {analyzedText && (loadingSimulation || simulation || simulationError) && (
-        <div style={{ marginTop: "1.25rem" }}>
+      {mode === "single" && analyzedText && (loadingSimulation || simulation || simulationError) && (
+        <div className="reveal" style={{ marginTop: "1.25rem" }}>
           <AudiencePanel data={simulation} loading={loadingSimulation} error={simulationError} />
         </div>
       )}
 
-      {results.length > 0 && (
-        <>
+      {mode === "single" && results.length > 0 && (
+        <div className="reveal-group">
           <NetworkCompare results={results} selected={selected} onSelect={selectNetwork} />
           {sel && (
             <>
@@ -441,7 +555,7 @@ export default function Analyze() {
               </div>
             </>
           )}
-        </>
+        </div>
       )}
     </>
   );

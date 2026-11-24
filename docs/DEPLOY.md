@@ -5,7 +5,7 @@
 
 ---
 
-## 1. Hệ thống gồm hai phần tách rời
+## 1. Hệ thống gồqm hai phần tách rời
 
 | Phần | Là gì | Cần gì để chạy | Trạng thái |
 |---|---|---|---|

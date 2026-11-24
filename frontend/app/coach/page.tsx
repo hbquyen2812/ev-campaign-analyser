@@ -8,6 +8,7 @@ import type { CoachResponse, CoachTurn } from "@/lib/types";
 import { useLang } from "../LangContext";
 import { useT } from "@/lib/i18n";
 import { Icon } from "../components";
+import Showroom from "./Showroom";
 
 interface Coaching {
   feedback: string;
@@ -31,6 +32,10 @@ export default function Coach() {
   const [warning, setWarning] = useState<string | null>(null);
   const [round, setRound] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Nobody is talking until the trainee walks their salesperson over to someone.
+  const [talkingTo, setTalkingTo] = useState<string | null>(null);
+  const [walkReq, setWalkReq] = useState<{ id: string; n: number } | null>(null);
 
   const persona = PERSONAS.find((p) => p.id === personaId) ?? PERSONAS[0];
 
@@ -80,6 +85,18 @@ export default function Coach() {
     }
   }
 
+  function startTalking(id: string) {
+    if (loading) return;
+    setTalkingTo(id);
+    if (id !== personaId) setPersonaId(id);
+    // Hand the keyboard to the answer box: from here on the trainee types.
+    setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 0);
+  }
+
+  const lastTurn = history[history.length - 1];
+  const customerLine = talkingTo && lastTurn?.role === "customer" ? lastTurn.text : null;
+  const sellerLine = lastTurn?.role === "seller" ? lastTurn.text : null;
+
   const trustTone = trust >= 60 ? "high" : trust >= 35 ? "mid" : "low";
 
   return (
@@ -87,12 +104,26 @@ export default function Coach() {
       <h1>{t("co.title")}</h1>
       <p className="lede">{t("co.lede")}</p>
 
+      <Showroom
+        personas={PERSONAS}
+        lang={lang}
+        talkingTo={talkingTo}
+        walkRequest={walkReq}
+        onTalk={startTalking}
+        customerLine={customerLine}
+        sellerLine={sellerLine}
+        thinking={loading}
+        trust={trust}
+      />
+
+      {/* Same customers as on the plaza: pressing one walks your salesperson over. */}
       <div className="coach-picker">
         {PERSONAS.map((p) => (
           <button
             key={p.id}
-            className={`coach-chip${p.id === personaId ? " active" : ""}`}
-            onClick={() => setPersonaId(p.id)}
+            className={`coach-chip${p.id === talkingTo ? " active" : ""}`}
+            onClick={() => setWalkReq({ id: p.id, n: Date.now() })}
+            disabled={loading}
           >
             <span className="coach-chip-name">{p.name[lang]}</span>
             <span className="coach-chip-sub">{p.tagline[lang]}</span>
@@ -116,7 +147,13 @@ export default function Coach() {
         <div className="coach-sheet-note">{SPEC_SHEET.disclaimer[lang]}</div>
       </details>
 
-      <div className="card">
+      {!talkingTo && (
+        <div className="card coach-meet">
+          <Icon name="bulb" /> {t("co.stage.meet")}
+        </div>
+      )}
+
+      {talkingTo && <div className="card">
         <div className="coach-trust-head">
           <span>{t("co.trust", persona.name[lang])}</span>
           <span className="coach-trust-value">
@@ -158,6 +195,7 @@ export default function Coach() {
 
         <div className="coach-compose">
           <textarea
+            ref={inputRef}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
@@ -176,7 +214,7 @@ export default function Coach() {
             </button>
           </div>
         </div>
-      </div>
+      </div>}
 
       {coaching && (
         <div className="card">

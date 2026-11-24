@@ -64,11 +64,13 @@ export function NetworkCompare({ results, selected, onSelect }: {
           const rel = Math.round((reliability[r.source] ?? reliability[""]) * 100);
           const isViral = r.prediction.label === "viral-likely";
           return (
-            <button key={r.source} className={`net-card${r.source === selected ? " active" : ""}`} onClick={() => onSelect(r.source)}>
-              {r.source === best.source && <span className="net-best">{t("cmp.best")}</span>}
-              <div className="net-name">{NET_NAMES[r.source]}</div>
-              <div className={`net-score${isViral ? "" : " low"}`}>{pct}%</div>
-              <div className="net-sub">{labelText(t, r.prediction.label)} · {t("cmp.reliability", rel)}</div>
+            <button key={r.source} className={`net-card${r.source === selected ? " active" : ""}`} aria-pressed={r.source === selected} onClick={() => onSelect(r.source)}>
+              <div className="net-name">{NET_NAMES[r.source]}{r.source === best.source && <span className="net-best">{t("cmp.best")}</span>}</div>
+              <div className="screen">
+                <div className={`net-score${isViral ? "" : " low"}`}>{pct}<span>%</span></div>
+                <ChargeCells value={r.prediction.viral_score} low={!isViral} />
+              </div>
+              <div className="net-sub">{labelText(t, r.prediction.label)}, {t("cmp.reliability", rel)}</div>
             </button>
           );
         })}
@@ -89,20 +91,29 @@ function relevant(factors: Factor[]): Factor[] {
   return factors.filter((f) => !f.feature.startsWith("src_"));
 }
 
+// Segmented charge bar: one cell per 10 points, the tick marks the decision threshold.
+export function ChargeCells({ value, low = false, cells = 10 }: { value: number; low?: boolean; cells?: number }) {
+  const lit = Math.round(Math.min(Math.max(value, 0), 1) * cells);
+  return (
+    <span className={`charge${low ? " low" : ""}`} aria-hidden="true">
+      {Array.from({ length: cells }, (_, i) => (
+        <i key={i} className={i < lit ? "on" : ""} style={{ animationDelay: `${i * 70}ms` }} />
+      ))}
+      <b className="charge-mark" style={{ left: `${DECISION_THRESHOLD * 100}%` }} />
+    </span>
+  );
+}
+
 export function ScoreGauge({ prediction }: { prediction: Prediction }) {
   const { t } = useT();
   const pct = Math.round(prediction.viral_score * 100);
   const isViral = prediction.label === "viral-likely";
-  const C = 2 * Math.PI * 38;
-  const offset = C * (1 - prediction.viral_score);
-  const color = isViral ? "#15803d" : "#b45309";
   return (
     <div className={`gauge-card${isViral ? "" : " low"}`}>
-      <svg width="92" height="92" viewBox="0 0 92 92">
-        <circle cx="46" cy="46" r="38" fill="none" stroke="#ffffff" strokeWidth="9" />
-        <circle cx="46" cy="46" r="38" fill="none" stroke={color} strokeWidth="9" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={offset} transform="rotate(-90 46 46)" />
-        <text x="46" y="52" textAnchor="middle" fontSize="22" fontWeight="700" fill={color} fontFamily="var(--font-head)">{pct}%</text>
-      </svg>
+      <div className="screen">
+        <div className="screen-pct">{pct}<span>%</span></div>
+        <ChargeCells value={prediction.viral_score} low={!isViral} />
+      </div>
       <div>
         <div className="gauge-label">{t("cmp.viralprob")} <InfoTip term="probability" /></div>
         <div className="badge">{labelText(t, prediction.label)}</div>

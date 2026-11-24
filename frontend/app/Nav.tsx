@@ -11,7 +11,6 @@ import { Icon } from "./components";
 const LINKS = [
   { href: "/analyze", key: "nav.analyze" },
   { href: "/coach", key: "nav.coach" },
-  { href: "/variant-lab", key: "nav.variant" },
   { href: "/history", key: "nav.history" },
   { href: "/insights", key: "nav.insights" },
 ];
@@ -26,7 +25,7 @@ export default function Nav() {
       <div className="nav-inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
           <span className="logo" aria-hidden="true">
-            <Image src="/logo.svg" alt="" width={60} height={60} priority />
+            <Image src="/logo.svg" alt="" width={36} height={36} priority />
           </span>
           <span className="brand-name">EV campaign analyser</span>
         </Link>

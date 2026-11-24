@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 const SITE_URL = "https://ev-campaignanalyser.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ["", "/analyze", "/variant-lab", "/history", "/insights"];
+  const routes = ["", "/analyze", "/history", "/insights"];
   const now = new Date();
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,

@@ -151,3 +151,7 @@ tests/scripts/verify_issue_82.py
 *.doc
 *.docx
 *.pdf
+
+# Vercel credentials
+credential.json
+.vercel/
